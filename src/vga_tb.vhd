@@ -9,12 +9,9 @@
 ----------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 LIBRARY std;
 USE std.textio.ALL;
- 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
  
 ENTITY vga_tb IS
 END vga_tb;
@@ -88,6 +85,7 @@ BEGIN
 		FILE output_file: TEXT is out "output.dat";
 		variable write_line: LINE;
 		variable caca: std_logic;
+		variable previousX, previousY: integer := -1;
    begin		
       -- hold reset state for 100 ns.
 		if i = 0 then
@@ -95,20 +93,24 @@ BEGIN
 			reset <= '1';
 		end if;
 		
-		-- other periods
-		write (write_line, 0);
-		if HSync = '1' then
-			writeline (output_file, write_line);
+		-- record image:
+		if reset = '1' then
+			if VSync = '1' then
+				if to_integer( unsigned(X) ) /= previousX and to_integer( unsigned(Y) /= previousY then
+					write (write_line, 0);
+					previousX := to_integer( unsigned(X) );
+					previousY := to_integer( unsigned(Y) );
+				end if;
+			
+				if HSync = '0' then
+					writeline (output_file, write_line);
+				end if;
+			else
+				wait;
+			end if;
 		end if;
 		
       wait for clk_period;
-		
-		-- do this just for a whole sreen cycle
-		if i < 640 * 480 then
-			i := i + 1;
-		else
-			assert False report "End of simulation." severity error;
-		end if;
 			
    end process;
 

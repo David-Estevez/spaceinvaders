@@ -39,7 +39,7 @@ architecture Behavioral of edgeDetector_tb is
 	signal detected: std_logic;
 	
 	-- clk period
-	constant clk_period: time := 10 ns;
+	constant clk_period: time := 20 ns;
 	
 begin
 

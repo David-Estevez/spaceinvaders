@@ -27,12 +27,11 @@
 --------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 LIBRARY std;
 USE std.textio.ALL;
- 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
-USE ieee.numeric_std.ALL;
+
+
  
 ENTITY SpaceInv_tb IS
 END SpaceInv_tb;
@@ -99,6 +98,7 @@ BEGIN
 		FILE output_image: TEXT is out "output.ppm";
 		variable write_line: LINE;
 		variable dummy: integer := 0;
+		variable previousX, previousY: integer := -1;
    begin		
       -- hold reset state for 100 ns.
 		if i = 0 then
@@ -110,35 +110,43 @@ BEGIN
 			writeline( output_image, write_line);
 		else
 		
-		-- Write to a file:
-		----------------------------------------------
-		-- Red channel
-		if R = '0' then
-			write (write_line, 0);
-		else
-			write (write_line, 1);
-		end if;
-		write (write_line, " ");
-		
-		-- Green channel
-		if G = '0' then
-			write (write_line, 0);
-		else
-			write (write_line, 1);
-		end if;
-		write (write_line, " ");		
-		
-		-- Blue channel
-		if B = '0' then
-			write (write_line, 0);
-		else
-			write (write_line, 1);
-		end if;
-		write (write_line, " ");		
-		
-		if HSync = '1' then
-			writeline (output_image, write_line);
-		end if;
+			if reset = '1' then
+				if VSync = '1' then
+					if to_integer( unsigned(X) ) /= previousX and to_integer( unsigned(Y) /= previousY then
+						-- Write to a file:
+						----------------------------------------------
+						-- Red channel
+						if R = '0' then
+							write (write_line, 0);
+						else
+							write (write_line, 1);
+						end if;
+						write (write_line, " ");
+						
+						-- Green channel
+						if G = '0' then
+							write (write_line, 0);
+						else
+							write (write_line, 1);
+						end if;
+						write (write_line, " ");		
+						
+						-- Blue channel
+						if B = '0' then
+							write (write_line, 0);
+						else
+							write (write_line, 1);
+						end if;
+						write (write_line, " ");		
+					
+						previousX := to_integer( unsigned(X) );
+						previousY := to_integer( unsigned(Y) );
+					end if;
+					
+					if HSync = '0' then
+						writeline (output_image, write_line);
+					end if;
+				end if;
 		end if;
 		
       wait for clk_period;

@@ -24,7 +24,7 @@ architecture Behavioral of spaceship is
 
 begin
 	process( reset, clk )
-		variable posHAux: integer range 19 to 0 := 9; -- To be able to update the ship position
+		variable posHAux: integer range 0 to 19 := 9; -- To be able to update the ship position
 	begin
 		-- Low level reset
 		if reset = '0' then
