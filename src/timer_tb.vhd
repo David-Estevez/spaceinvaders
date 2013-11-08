@@ -17,8 +17,7 @@ ARCHITECTURE behavior OF timer_tb IS
     PORT(
          clk : IN  std_logic;
          reset : IN  std_logic;
-         clear : IN  std_logic;
-			start : IN  std_logic;
+         en : IN  std_logic;
          q : OUT  std_logic
         );
     END COMPONENT;
@@ -27,8 +26,7 @@ ARCHITECTURE behavior OF timer_tb IS
    --Inputs
    signal clk : std_logic := '0';
    signal reset : std_logic := '0';
-   signal clear : std_logic := '0';
-	signal start : std_logic := '0';
+   signal en : std_logic := '0';
 
  	--Outputs
    signal q : std_logic;
@@ -40,12 +38,11 @@ BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: timer
-			generic map (10 us)
+			generic map (200 ns)
 			PORT MAP (
           clk => clk,
           reset => reset,
-          clear => clear,
-          start => start,
+          en => en,
 			 q => q
         );
 
@@ -66,21 +63,7 @@ BEGIN
 		reset <= '1';
       wait for 100 ns;	
 		reset <= '0';
-		start <= '1';
-      wait for clk_period;
-		start <= '0';
-		wait for 200 ns;
-		clear <= '1';
-		wait for clk_period;
-		clear <= '0';
-		wait for 200 ns;
-		start <= '1';
-      wait for clk_period;
-		start <= '0';
-		
-
-      -- insert stimulus here 
-
+		en <= '1';
       wait;
    end process;
 
