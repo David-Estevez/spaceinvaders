@@ -17,21 +17,19 @@ end timer;
 
 architecture behavioral of timer is
 	constant clkFreq : integer := 50; -- 50 MHz clock
-	
+	constant max : integer := (((t/(1 ns))*clkFreq)/1000)-1;
+	signal count : integer range 0 to max;
 begin
-   process (reset, clk)
-      variable max : integer := (((t/(1 ns))*clkFreq)/1000)-1;
-		variable count : integer range 0 to max;
-	   
+   process (reset, clk)	   
    begin
-      if reset = '1' then 
-         count := 0;
+      if reset = '0' then 
+         count <= 0;
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
          if count = max then
-            count := 0;
+            count <= 0;
          elsif en = '1' then
-            count := count + 1;
+            count <= count + 1;
          end if;
       end if; 
 
