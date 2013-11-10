@@ -101,7 +101,7 @@ begin
 					Test => Test
 					);
 					
-	vgaController: vga 
+	vgaController: entity work.vga(Simulation)
 		PORT MAP( 
 					clk => clk, 
 					reset => reset, 

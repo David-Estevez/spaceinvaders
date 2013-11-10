@@ -42,20 +42,23 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
  
     COMPONENT SpaceInv
     PORT(
-         clk : IN  std_logic;
-         reset : IN  std_logic;
-         HSync : OUT  std_logic;
-         VSync : OUT  std_logic;
-         R : OUT  std_logic;
-         G : OUT  std_logic;
-         B : OUT  std_logic
-        );
+			clk : in  STD_LOGIC;
+         reset : in  STD_LOGIC;
+			Test: in STD_LOGIC; 	  
+         Izquierda, Derecha: in STD_LOGIC;
+			HSync : out  STD_LOGIC;
+         VSync : out  STD_LOGIC;
+         R,G,B : out  STD_LOGIC
+			);
     END COMPONENT;
     
 
    --Inputs
    signal clk : std_logic := '0';
    signal reset : std_logic := '0';
+	signal Test : std_logic := '0';
+	signal Izquierda : std_logic := '0';
+	signal Derecha: std_logic := '0';
 
  	--Outputs
    signal HSync : std_logic;
@@ -73,6 +76,9 @@ BEGIN
    uut: SpaceInv PORT MAP (
           clk => clk,
           reset => reset,
+			 Test => Test,
+			 Izquierda => Izquierda,
+			 Derecha => Derecha,
           HSync => HSync,
           VSync => VSync,
           R => R,
@@ -93,75 +99,16 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
-		variable i: integer := 0;
-		FILE output_file: TEXT is out "output.dat";
-		FILE output_image: TEXT is out "output.ppm";
-		variable write_line: LINE;
-		variable dummy: integer := 0;
-		variable previousX, previousY: integer := -1;
-   begin		
-      -- hold reset state for 100 ns.
-		if i = 0 then
-			wait for 100 ns;	
-			reset <= '1';
-			
-			-- Write header to file:
-			write( write_line, "P3 640 480 1");
-			writeline( output_image, write_line);
-		else
-		
-			if reset = '1' then
-				if VSync = '1' then
-					if to_integer( unsigned(X) ) /= previousX and to_integer( unsigned(Y) /= previousY then
-						-- Write to a file:
-						----------------------------------------------
-						-- Red channel
-						if R = '0' then
-							write (write_line, 0);
-						else
-							write (write_line, 1);
-						end if;
-						write (write_line, " ");
-						
-						-- Green channel
-						if G = '0' then
-							write (write_line, 0);
-						else
-							write (write_line, 1);
-						end if;
-						write (write_line, " ");		
-						
-						-- Blue channel
-						if B = '0' then
-							write (write_line, 0);
-						else
-							write (write_line, 1);
-						end if;
-						write (write_line, " ");		
-					
-						previousX := to_integer( unsigned(X) );
-						previousY := to_integer( unsigned(Y) );
-					end if;
-					
-					if HSync = '0' then
-						writeline (output_image, write_line);
-					end if;
-				end if;
-		end if;
-		
-      wait for clk_period;
-		--------------------------------------------
-		
-		-- do this just for a whole sreen cycle
-		--if i < 640 * 480 then
-		--	i := i + 1;
-		--else
-		--	assert False report "End of simulation." severity error;
-		--end if;
-		
+
+   begin
+		reset <= '1';	
+		wait for 100 ns;	
+		reset <= '0';
+		Test <= '0';
+      wait for 640*480*clk_period;
+		assert false report "Simulation stopped" severity failure;
 		wait;
 		
    end process;
-
 
 END;

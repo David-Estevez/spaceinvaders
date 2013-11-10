@@ -26,8 +26,8 @@ begin
 	process( reset, clk )
 		variable posHAux: integer range 0 to 19 := 9; -- To be able to update the ship position
 	begin
-		-- Low level reset
-		if reset = '0' then
+		-- High level reset
+		if reset = '1' then
 			posH <= "00111"; -- Center the ship
 			posHAux := 9;
 		-- Synchronous behaviour

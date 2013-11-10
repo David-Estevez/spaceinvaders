@@ -56,7 +56,8 @@ ARCHITECTURE behavior OF vga_tb IS
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: vga PORT MAP (
+   uut: vga(simulation)
+	PORT MAP (
           clk => clk,
           reset => reset,
           RGB => RGB,
@@ -81,11 +82,6 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
-		variable i: integer := 0;
-		FILE output_file: TEXT is out "output.dat";
-		variable write_line: LINE;
-		variable caca: std_logic;
-		variable previousX, previousY: integer := -1;
    begin		
       -- hold reset state for 100 ns.
 		if i = 0 then
@@ -93,23 +89,7 @@ BEGIN
 			reset <= '1';
 		end if;
 		
-		-- record image:
-		if reset = '1' then
-			if VSync = '1' then
-				if to_integer( unsigned(X) ) /= previousX and to_integer( unsigned(Y) /= previousY then
-					write (write_line, 0);
-					previousX := to_integer( unsigned(X) );
-					previousY := to_integer( unsigned(Y) );
-				end if;
-			
-				if HSync = '0' then
-					writeline (output_file, write_line);
-				end if;
-			else
-				wait;
-			end if;
-		end if;
-		
+
       wait for clk_period;
 			
    end process;

@@ -108,3 +108,108 @@ begin
 
 end Behavioral;
 
+-- This is used to take captures of the screen
+LIBRARY std;
+USE std.textio.ALL;
+architecture Simulation of vga is
+
+begin  	
+	process(reset, clk)
+		variable HCount: integer range 0 to 640:= 0;
+		variable VCount: integer range 0 to 480 := 0;
+		variable start: std_logic := '1';
+		variable finish: std_logic := '0';
+		-- File variables:
+		FILE output_image: TEXT is out "output.ppm";
+		variable write_line: LINE;
+	begin
+		if reset = '1' and start = '0' then 
+			HCount := 0;
+			VCount := 0;
+			start := '1';
+			finish := '0';
+		elsif clk'Event and clk = '1' then
+			-- Counter
+
+			if HCount = 639 then
+				HCount := 0;
+				HSync <= '1';
+								
+				if VCount = 479 then
+					VCount := 0;
+					VSync <= '1';
+				else
+					VCount := VCount + 1;
+					VSync <= '0';
+				end if;
+			else
+				HCount := HCount + 1;		
+				HSync <= '0';
+			end if;
+					
+		end if;
+		
+		-- Output
+		if HCount < 640 then
+			X <= std_logic_vector( to_unsigned(HCount, 10 ));
+		end if;
+		
+		if VCount < 480 then
+			Y <= std_logic_vector( to_unsigned(VCount, 10 ));
+		end if;
+		
+		-- Writing things
+		if finish = '0' then
+			if HCount = 0 and VCount = 0 and start = '1' and reset = '0' then
+				-- Write file header
+				write( write_line, "P3 640 480 1");
+				writeline( output_image, write_line);
+				start := '0';
+			else
+				-- Write R
+				--write (write_line, (to_integer( unsigned'( "" & RGB(0) ) )) );
+				if RGB(0) = '0' then
+					write( write_line, 0);
+				else
+					write( write_line, 1);
+				end if;
+				write (write_line, " ");
+				
+
+				-- Write G
+				--write (write_line, (to_integer( unsigned'( "" & RGB(1) ) )) );
+				if RGB(1) = '0' then
+					write( write_line, 0);
+				else
+					write( write_line, 1);
+				end if;
+				write (write_line, " ");
+				-- Write B
+				--write (write_line, (to_integer( unsigned'( "" & RGB(2) ) )) );
+				if RGB(2) = '0' then
+					write( write_line, 0);
+				else
+					write( write_line, 1);
+				end if;
+				write (write_line, " ");
+				
+				if HCount = 0 then
+					writeline( output_image, write_line);
+				end if;
+				
+				if start = '0' and HCount = 0 and VCount = 0 then
+					finish := '1';
+				else
+					finish := '0';
+				end if;
+				
+				
+			end if;
+					
+		end if;
+		
+	R <= RGB(0);
+	G <= RGB(1);
+	B <= RGB(2);
+	end process;
+end Simulation;
