@@ -35,7 +35,7 @@ architecture behavioral of invaders is
 begin
 
    speedTimer: timer
-      generic  map (10 us)
+      generic  map (16672 us)
       port     map (
          clk => clk,
          reset => reset,
