@@ -36,7 +36,7 @@ begin
 		variable prescaler: std_logic := '0';
 	begin
 	-- When resetting, set all outputs to 0
-			if reset = '0' then
+			if reset = '1' then
 					HSync <= '1';
 					VSync <= '1';
 					R <= '0';

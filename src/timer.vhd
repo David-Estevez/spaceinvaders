@@ -22,7 +22,7 @@ architecture behavioral of timer is
 begin
    process (reset, clk)	   
    begin
-      if reset = '0' then 
+      if reset = '1' then 
          count <= 0;
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
