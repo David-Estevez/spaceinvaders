@@ -77,7 +77,7 @@ BEGIN
  
 
    -- Stimulus process
-   stim_proc: process
+   stim_proc: processgit
    begin
 		reset <= '1';	
 		wait for 100 ns;	
