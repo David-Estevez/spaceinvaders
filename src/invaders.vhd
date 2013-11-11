@@ -23,7 +23,7 @@ architecture behavioral of invaders is
    signal tick  : std_logic; -- Signal from timer
 
    component timer
-      generic (t: time);
+      generic (t: integer);
       port(
          clk   : in  std_logic;
          reset : in  std_logic;
@@ -35,7 +35,7 @@ architecture behavioral of invaders is
 begin
 
    speedTimer: timer
-      generic  map (16672 us)
+      generic  map (100)
       port     map (
          clk => clk,
          reset => reset,

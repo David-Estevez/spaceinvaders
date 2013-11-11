@@ -15,7 +15,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity edgeDetectorDebounce is
-	generic( debounceTime: time := 1ms );
+	generic( debounceTime: integer := 1 );
 	port( clk: in STD_LOGIC;
 		  reset: in STD_LOGIC;
 		  enable: in STD_LOGIC;
@@ -38,7 +38,7 @@ architecture Behavioral of edgeDetectorDebounce is
 	signal timeout: std_logic;
 
 	component timer is
-		generic  (  t: time := 1 ms);
+		generic  (  t: integer);
 		port (clk   : in  std_logic;
 				reset : in  std_logic;
 				en    : in  std_logic;
