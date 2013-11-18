@@ -28,7 +28,7 @@ begin
 		variable previousState: STD_LOGIC;
 	begin
 		-- Reset
-		if reset = '0' then
+		if reset = '1' then
 			currentState := '0';
 			previousState := '0';
 			detected <= '0';

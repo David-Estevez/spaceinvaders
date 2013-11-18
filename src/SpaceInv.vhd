@@ -59,6 +59,7 @@ architecture Behavioral of SpaceInv is
 	component invaders is
    port (clk   : in  std_logic;
          reset : in  std_logic;
+			start : in  std_logic;
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
          hit   : out std_logic;
@@ -81,6 +82,16 @@ architecture Behavioral of SpaceInv is
 	
 	-- Component declaration for button edge detector (with/without debouncing )
 	COMPONENT edgeDetector
+	PORT ( 
+			clk: in STD_LOGIC;
+			reset: in STD_LOGIC;
+			enable: in STD_LOGIC;
+			input: in STD_LOGIC;
+			detected: out STD_LOGIC 
+			);
+	END COMPONENT;
+	
+	COMPONENT edgeDetectorDebounce
 	PORT ( 
 			clk: in STD_LOGIC;
 			reset: in STD_LOGIC;
@@ -138,6 +149,7 @@ begin
 		PORT MAP(
 					clk => clk,
 					reset => reset,
+					start => inicio,
 					bullX => bullX,
 					bullY => bullY,
 					hit => hit,
@@ -148,14 +160,14 @@ begin
 	spaceshipControl: spaceship 
 		PORT MAP( 
 					clk => clk,
-					reset => clk,
+					reset => reset,
 					left => leftDetected,
 					right => rightDetected,
 					enable => '1',
 					posH => shipX 
 					);
 				
-	leftEdgeDetector: edgeDetector
+	leftEdgeDetector: edgeDetectorDebounce
 		PORT MAP(
 					clk => clk,
 					reset => reset,
@@ -164,7 +176,7 @@ begin
 					detected => leftDetected
 					);
 					
-	rightEdgeDetector: edgeDetector
+	rightEdgeDetector: edgeDetectorDebounce
 		PORT MAP(
 					clk => clk,
 					reset => reset,

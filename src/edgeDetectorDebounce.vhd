@@ -15,7 +15,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity edgeDetectorDebounce is
-	generic( debounceTime: integer := 1 );
+	generic( debounceTime: integer := 100 );
 	port( clk: in STD_LOGIC;
 		  reset: in STD_LOGIC;
 		  enable: in STD_LOGIC;
@@ -57,7 +57,7 @@ begin
 	process( clk, reset)
 	begin
 		-- Reset
-		if reset = '0' then
+		if reset = '1' then
 			currentState <= notDetected;
 		-- Update State
 		elsif clk'Event and clk = '1' then

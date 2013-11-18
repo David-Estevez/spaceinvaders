@@ -9,6 +9,7 @@ use ieee.numeric_std.all;
 entity invaders is
    port (clk   : in  std_logic;
          reset : in  std_logic;
+			start : in  std_logic;
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
          hit   : out std_logic;
@@ -21,6 +22,7 @@ end invaders;
 architecture behavioral of invaders is
    signal right : std_logic := '0'; -- movement of invaders: 1 = right;
    signal tick  : std_logic; -- Signal from timer
+	signal moving : std_logic; 
 
    component timer
       generic (t: integer);
@@ -33,7 +35,7 @@ architecture behavioral of invaders is
    end component;
 
 begin
-
+	
    speedTimer: timer
       generic  map (100)
       port     map (
@@ -44,8 +46,10 @@ begin
    );
 
    process (reset, clk)
+		
    begin
       if reset = '1' then 
+			moving <= '0';
          invArray <= "00000000001111111111";
          invLine <= "0000"; 
          right <= '0';
@@ -53,7 +57,11 @@ begin
 
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
-			if tick = '1' then
+			if (start = '1') then
+				moving <= '1';
+			end if;
+		
+			if (tick = '1') and (moving = '1') then
 				-- Moving to the right
 				if right = '0' then 
 					if invArray(19) = '1' then
