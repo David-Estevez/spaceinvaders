@@ -46,7 +46,8 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
 
    -- Clock period definitions
    constant clk_period : time := 20 ns;
- 
+	constant frame_period: time := 16672 us;
+
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
@@ -84,7 +85,27 @@ BEGIN
 		reset <= '0';
       wait for clk_period*10;
 
-      -- insert stimulus here 
+      -- Go to 'test' state
+		test <= '1';
+		wait for frame_period;
+		
+		-- Go to 'start' state:
+		test <= '0';
+		wait for frame_period;
+		
+		-- Start the game:
+		Inicio <= '1';
+		wait for frame_period;
+		
+		-- Wait until aliens kill you (for this you have to setup aliens
+		-- on line 13 or otherwise you will likely die waiting for the simulation)
+		Inicio <= '0';
+		wait for 130ms;
+		
+		-- Go to the inicial state again:
+		Derecha <= '1';
+		wait for 2*frame_period;
+		
 
       wait;
    end process;

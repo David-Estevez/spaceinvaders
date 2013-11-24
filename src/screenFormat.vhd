@@ -16,6 +16,7 @@ port (
 	shipX	: in std_logic_vector (4 downto 0);
 	bullX 	: in std_logic_vector (4 downto 0);  
 	bullY 	: in std_logic_vector (3 downto 0);
+	specialScreen: in std_logic_vector( 2 downto 0);
 	rgb 	: out std_logic_vector(2 downto 0)
 );
 end screenFormat;
@@ -41,18 +42,37 @@ begin
 				rgb <= "111"; 
 			end if;
 		else
-			-- Show bullet in red
-			if (x = bullX) and (y = bullY) then
-				rgb <= "100";
-			-- Show ship in blue		
-			elsif (x = shipX) and (y = std_logic_vector(to_unsigned(14,4))) then
-				rgb <= "001";
-			-- Show invaders in green	
-			elsif (invArray(to_integer(unsigned(x))) = '1') and (y = invLine) then
-				rgb <= "010";
-			else
-				rgb <= "000";
-			end if ;
+			case specialScreen is
+				when "000" =>
+					-- No special screen (show game)
+					------------------------------------
+					-- Show bullet in red
+					if (x = bullX) and (y = bullY) then
+						rgb <= "100";
+					-- Show ship in blue		
+					elsif (x = shipX) and (y = std_logic_vector(to_unsigned(14,4))) then
+						rgb <= "001";
+					-- Show invaders in green	
+					elsif (invArray(to_integer(unsigned(x))) = '1') and (y = invLine) then
+						rgb <= "010";
+					else
+						rgb <= "000";
+					end if ;
+					
+				when "001" =>
+					-- You win screen
+					-------------------------------------
+					rgb <= "100"; -- Temporarily red
+					
+				when "010" =>
+					-- You lose screen
+					-------------------------------------
+					rgb <= "001"; -- Temporarily blue
+					
+				when others =>
+					rgb <= "XXX"; -- Indicate error
+				
+			end case;
 		end if ;
 	end process;
 end behavioral;
