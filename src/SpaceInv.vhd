@@ -51,13 +51,15 @@ architecture Behavioral of SpaceInv is
 		shipX	: in std_logic_vector (4 downto 0);
 		bullX 	: in std_logic_vector (4 downto 0);  
 		bullY 	: in std_logic_vector (3 downto 0);
+		specialScreen: in std_logic_vector( 2 downto 0);
 		rgb 	: out std_logic_vector(2 downto 0)
 );
 	END COMPONENT;
 	
 
 	component invaders is
-   port (clk   : in  std_logic;
+   port (
+			clk   : in  std_logic;
          reset : in  std_logic;
 			start : in  std_logic;
          bullX : in  std_logic_vector(4 downto 0);
@@ -104,7 +106,16 @@ architecture Behavioral of SpaceInv is
 	-- Internal signals
 	signal RGB: STD_LOGIC_VECTOR (2 downto 0);
 	signal X, Y: STD_LOGIC_VECTOR (9 downto 0);
+	signal specialScreen: STD_LOGIC_VECTOR( 2 downto 0);
 	signal hit: STD_LOGIC;
+	signal testEnable: STD_LOGIC;
+	
+	-- Reset lines:
+	signal leftDetectorReset: STD_LOGIC;
+	signal rightDetectorReset: STD_LOGIC;
+	signal invadersReset: STD_LOGIC;
+	signal spaceshipReset: STD_LOGIC;
+	-- TODO Add shooting reset
 	
 	-- Inputs to ScreenFormat
 	signal invArray: std_logic_vector (19 downto 0);
@@ -116,6 +127,10 @@ architecture Behavioral of SpaceInv is
 	-- Output from the edge detectors
 	signal leftDetected: STD_LOGIC;
 	signal rightDetected: STD_LOGIC;
+	
+	-- State machine things:
+	type State is ( testState, Start, Playing, YouWin, YouLose );
+	signal currentState, nextState: State;
 
 begin
 	vgaController: vga 
@@ -134,21 +149,22 @@ begin
 
 	framebuffer: screenFormat
 		PORT MAP(
-					VGAx 		=> X,
-					VGAy 		=> Y,
-					test 		=> test,
-					invArray => invArray,
-					invLine 	=> invLine,
-					shipX	 	=> shipX,
-					bullX 	=> bullX,
-					bullY 	=> bullY,
-					rgb 	 	=> rgb
+					VGAx 				=> X,
+					VGAy 				=> Y,
+					test 				=> testEnable,
+					invArray 		=> invArray,
+					invLine 			=> invLine,
+					shipX	 			=> shipX,
+					bullX 			=> bullX,
+					bullY 			=> bullY,
+					specialScreen  => specialScreen,
+					rgb 	 			=> rgb
 					);
 	
 	badGuys: invaders
 		PORT MAP(
 					clk => clk,
-					reset => reset,
+					reset => invadersReset,
 					start => inicio,
 					bullX => bullX,
 					bullY => bullY,
@@ -160,7 +176,7 @@ begin
 	spaceshipControl: spaceship 
 		PORT MAP( 
 					clk => clk,
-					reset => reset,
+					reset => spaceshipReset,
 					left => leftDetected,
 					right => rightDetected,
 					enable => '1',
@@ -170,7 +186,7 @@ begin
 	leftEdgeDetector: edgeDetectorDebounce
 		PORT MAP(
 					clk => clk,
-					reset => reset,
+					reset => leftDetectorReset,
 					enable => '1',
 					input => Izquierda,
 					detected => leftDetected
@@ -179,10 +195,117 @@ begin
 	rightEdgeDetector: edgeDetectorDebounce
 		PORT MAP(
 					clk => clk,
-					reset => reset,
-					enable => '1',
+					reset => rightDetectorReset,
+					enable =>  '1',
 					input => Derecha,
 					detected => rightDetected
 					);
+					
+	-- Process for changing states:
+	process( clk, reset)
+	begin
+		-- Reset
+		if reset = '1' then
+			currentState <= Start;
+		-- Update State
+		elsif clk'Event and clk = '1' then
+					currentState <= nextState;				
+		end if;
+	end process;
+	
+	-- Process for modelling the transitions / outputs 
+	-- of the state machine
+	process( currentState, Test, Inicio, invArray, invLine, Izquierda, Derecha)
+	begin
+		nextState <= currentState;
+		
+			case currentState is
+				when testState=> 
+					-- Show checkerboard pattern
+					-- Set outputs:
+					testEnable <= '1';
+					specialScreen <= "000";
+					leftDetectorReset <= '1';
+					rightDetectorReset <= '1';
+					invadersReset <= '1';
+					spaceshipReset <= '1';
+					
+					-- Next state:
+					if ( Test = '0' ) then
+						nextState <= Start;
+					end if;
+				
+				when Start =>
+					-- Wait for user to start the game
+					-- Set outputs:
+					testEnable <= '0';
+					specialScreen <= "000";
+					leftDetectorReset <= '1';
+					rightDetectorReset <= '1';
+					invadersReset <= '1';
+					spaceshipReset <= '1';
+					
+					-- Next state:
+					if ( Test = '1' ) then
+						nextState <= testState;
+					elsif ( Inicio = '1' ) then
+						nextState <= Playing;
+					end if;
+				
+				when Playing =>
+					-- Playing the game
+					-- Set outputs:
+					testEnable <= '0';
+					specialScreen <= "000";
+					leftDetectorReset <= '0';
+					rightDetectorReset <= '0';
+					invadersReset <= '0';
+					spaceshipReset <= '0';
+					
+					-- Next state:
+					if ( Test = '1' ) then 
+						nextState <= testState;
+					elsif ( invArray = "00000000000000000000" ) then
+						nextState <= YouWin;
+					elsif ( invLine = "1110" ) then
+						nextState <= YouLose;
+					end if;
+
+				when YouWin =>
+					-- Winning screen 
+					-- Set outputs:
+					testEnable <= '0';
+					specialScreen <= "001";
+					leftDetectorReset <= '0';
+					rightDetectorReset <= '0';
+					invadersReset <= '1';
+					spaceshipReset <= '1';
+					
+					-- Next state:
+					if ( Test = '1' ) then 
+						nextState <= testState;
+					elsif ( Izquierda = '1' or Derecha = '1' ) then
+						nextState <= Start;
+					end if;
+					
+				when YouLose =>
+					-- Losing screen
+					-- Set outputs:
+					testEnable <= '0';
+					specialScreen <= "010";
+					leftDetectorReset <= '0';
+					rightDetectorReset <= '0';
+					invadersReset <= '1';
+					spaceshipReset <= '1';
+					
+					-- Next state:
+					if ( Test = '1' ) then
+						nextState <= testState;
+					elsif ( Izquierda = '1' or Derecha = '1' ) then
+						nextState <= Start;
+					end if;
+			end case;
+		end process;
+		
 end Behavioral;
 

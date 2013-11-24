@@ -37,7 +37,7 @@ architecture behavioral of invaders is
 begin
 	
    speedTimer: timer
-      generic  map (100)
+      generic  map (100) -- Set this to a value around 10 for a faster simulation
       port     map (
          clk => clk,
          reset => reset,
@@ -46,14 +46,23 @@ begin
    );
 
    process (reset, clk)
-		
    begin
       if reset = '1' then 
+			--Default values:
 			moving <= '0';
-         invArray <= "00000000001111111111";
-         invLine <= "0000"; 
-         right <= '0';
+			right <= '0';
 			hit <= '0';
+			
+			-- Choose this value for simulating 'you win' state:
+         --invArray <=  "00000000000000000000" ;
+			-- Otherwise, this is the correct value:
+			invArray <= "00000000001111111111";
+			
+			-- Choose this value for simulating 'you lose' state:
+			-- invLine <= "1101";
+			-- Otherwise, this is the correct value:
+         invLine <= "0000"; 
+			
 
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
@@ -66,7 +75,12 @@ begin
 				if right = '0' then 
 					if invArray(19) = '1' then
 						right <= '1';
-						invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+						-- Prevent further movement if the end has been reached
+						if invLine /= "1110" then
+							invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+						else
+							moving <= '0';
+						end if;
 					else
 						invArray <= invArray(18 downto 0) & '0';
 					end if;
@@ -75,7 +89,12 @@ begin
 				else                
             if invArray(0) = '1' then
 						right <= '0';
-						invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+						-- Prevent further movement if the end has been reached
+						if invLine /= "1110" then
+							invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+						else
+							moving <= '0';
+						end if;
 					else
 						invArray <= '0' & invArray(19 downto 1);
 					end if;
