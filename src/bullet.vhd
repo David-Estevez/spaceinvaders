@@ -34,7 +34,7 @@ architecture behavioral of bullet is
 begin
 	
    speedTimer: timer
-      generic  map (100) -- Period of movement in ms
+      generic  map (50) -- Period of movement in ms
       port     map (
          clk => clk,
          reset => reset,

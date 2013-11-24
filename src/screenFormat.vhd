@@ -16,6 +16,7 @@ port (
 	shipX	: in std_logic_vector (4 downto 0);
 	bullX 	: in std_logic_vector (4 downto 0);  
 	bullY 	: in std_logic_vector (3 downto 0);
+	bulletFlying: in std_logic;
 	specialScreen: in std_logic_vector( 2 downto 0);
 	rgb 	: out std_logic_vector(2 downto 0)
 );
@@ -47,7 +48,7 @@ begin
 					-- No special screen (show game)
 					------------------------------------
 					-- Show bullet in red
-					if (x = bullX) and (y = bullY) then
+					if bulletFlying = '1' and (x = bullX) and (y = bullY) then
 						rgb <= "100";
 					-- Show ship in blue		
 					elsif (x = shipX) and (y = std_logic_vector(to_unsigned(14,4))) then

@@ -16,6 +16,7 @@ entity SpaceInv is
 			  Test: in STD_LOGIC; 	 
 			  Inicio: in STD_LOGIC; 
            Izquierda, Derecha: in STD_LOGIC;
+			  Disparo: in STD_LOGIC;
 			  HSync : out  STD_LOGIC;
            VSync : out  STD_LOGIC;
            R,G,B : out  STD_LOGIC
@@ -51,6 +52,7 @@ architecture Behavioral of SpaceInv is
 		shipX	: in std_logic_vector (4 downto 0);
 		bullX 	: in std_logic_vector (4 downto 0);  
 		bullY 	: in std_logic_vector (3 downto 0);
+		bulletFlying: in std_logic;
 		specialScreen: in std_logic_vector( 2 downto 0);
 		rgb 	: out std_logic_vector(2 downto 0)
 );
@@ -103,6 +105,20 @@ architecture Behavioral of SpaceInv is
 			);
 	END COMPONENT;
 	
+	
+	COMPONENT bullet
+   PORT (
+			clk      : in  std_logic;
+         reset    : in  std_logic;
+         hit      : in  std_logic;
+         disparo  : in  std_logic;
+         posH     : in  std_logic_vector(4 downto 0);
+         flying   : inout std_logic;   
+         bullX    : inout std_logic_vector(4 downto 0);
+         bullY    : inout std_logic_vector(3 downto 0)
+         ); 
+	END COMPONENT;
+	
 	-- Internal signals
 	signal RGB: STD_LOGIC_VECTOR (2 downto 0);
 	signal X, Y: STD_LOGIC_VECTOR (9 downto 0);
@@ -115,14 +131,15 @@ architecture Behavioral of SpaceInv is
 	signal rightDetectorReset: STD_LOGIC;
 	signal invadersReset: STD_LOGIC;
 	signal spaceshipReset: STD_LOGIC;
-	-- TODO Add shooting reset
+	signal bulletReset: STD_LOGIC;
 	
 	-- Inputs to ScreenFormat
 	signal invArray: std_logic_vector (19 downto 0);
 	signal invLine : std_logic_vector (3 downto 0);
-	signal shipX	: std_logic_vector (4 downto 0);
+	signal posH	: std_logic_vector (4 downto 0);
 	signal bullX 	: std_logic_vector (4 downto 0) := "11111";  
 	signal bullY 	: std_logic_vector (3 downto 0) := "1111";
+	signal bulletFlying  : std_logic;
 
 	-- Output from the edge detectors
 	signal leftDetected: STD_LOGIC;
@@ -154,9 +171,10 @@ begin
 					test 				=> testEnable,
 					invArray 		=> invArray,
 					invLine 			=> invLine,
-					shipX	 			=> shipX,
+					shipX	 			=> posH,
 					bullX 			=> bullX,
 					bullY 			=> bullY,
+					bulletFlying   => bulletFlying,
 					specialScreen  => specialScreen,
 					rgb 	 			=> rgb
 					);
@@ -180,7 +198,7 @@ begin
 					left => leftDetected,
 					right => rightDetected,
 					enable => '1',
-					posH => shipX 
+					posH => posH 
 					);
 				
 	leftEdgeDetector: edgeDetectorDebounce
@@ -201,6 +219,19 @@ begin
 					detected => rightDetected
 					);
 					
+	
+	laserGun: bullet
+		PORT MAP(
+				clk 		=> clk,
+				reset 	=> bulletReset,
+				hit   	=> hit,
+				disparo 	=>	Disparo, 
+				posH    	=> posH,
+				flying  	=> bulletFlying,   
+				bullX  	=> bullX,
+				bullY  	=> bullY
+				); 
+   
 	-- Process for changing states:
 	process( clk, reset)
 	begin
@@ -229,6 +260,7 @@ begin
 					rightDetectorReset <= '1';
 					invadersReset <= '1';
 					spaceshipReset <= '1';
+					bulletReset <= '1';
 					
 					-- Next state:
 					if ( Test = '0' ) then
@@ -244,6 +276,7 @@ begin
 					rightDetectorReset <= '1';
 					invadersReset <= '1';
 					spaceshipReset <= '1';
+					bulletReset <= '1';
 					
 					-- Next state:
 					if ( Test = '1' ) then
@@ -261,6 +294,7 @@ begin
 					rightDetectorReset <= '0';
 					invadersReset <= '0';
 					spaceshipReset <= '0';
+					bulletReset <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -280,7 +314,8 @@ begin
 					rightDetectorReset <= '0';
 					invadersReset <= '1';
 					spaceshipReset <= '1';
-					
+					bulletReset <= '1';
+										
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
@@ -297,6 +332,7 @@ begin
 					rightDetectorReset <= '0';
 					invadersReset <= '1';
 					spaceshipReset <= '1';
+					bulletReset <= '1';
 					
 					-- Next state:
 					if ( Test = '1' ) then
