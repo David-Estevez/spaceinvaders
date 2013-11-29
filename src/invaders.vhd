@@ -67,7 +67,7 @@ begin
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
 			if (start = '1') then
-				moving <= '0';--'1'; -- Set this to '0' to stop the invaders when testing the bullet
+				moving <= '1'; -- Set this to '0' to stop the invaders when testing the bullet
 			end if;
 		
 			if (tick = '1') and (moving = '1') then
