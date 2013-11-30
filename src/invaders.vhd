@@ -1,6 +1,19 @@
 ----------------------------------------------------------------------------------
--- Invaders
--- Sergio Vilches
+--
+-- Lab session #4: Invaders
+--
+-- Block controlling the space invaders
+--
+-- Each invader has its power encoded in 2 bits:
+-- 	00 -> no invader
+--		01 -> easy invader (1 shot)
+--		10 -> medium invader (2 shots)
+--		11 -> hard invader (3 shots)
+--
+-- Authors: 
+-- David Estévez Fernández
+-- Sergio Vilches Expósito
+--
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -13,7 +26,7 @@ entity invaders is
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
          hit   : out std_logic;
-         invArray : inout std_logic_vector(19 downto 0);
+         invArray : inout std_logic_vector(39 downto 0);
 			invLine   : inout std_logic_vector(3 downto 0)
          ); 
 end invaders;   
@@ -23,6 +36,9 @@ architecture behavioral of invaders is
    signal right : std_logic := '0'; -- movement of invaders: 1 = right;
    signal tick  : std_logic; -- Signal from timer
 	signal moving : std_logic; 
+	
+	--signal internalInvArray: std_logic_vector(19 downto 0);
+	--signal internalInvLine: std_logic_vector( 3 downto 0);
 
    component timer
       generic (t: integer);
@@ -35,17 +51,14 @@ architecture behavioral of invaders is
    end component;
 
 begin
-	
+	-- Instantiate a timer for invaders movement timing
    speedTimer: timer
       generic  map (100) -- Set this to a value around 10 for a faster simulation
-      port     map (
-         clk => clk,
-         reset => reset,
-         en => '1',
-         q => tick
-   );
+      port map ( clk => clk, reset => reset, en => '1', q => tick );
 
+	-- Main process
    process (reset, clk)
+		variable intBulletX: integer; -- Temporarily storage for bullet X position translated into 2-bit-per-alien coordinates
    begin
       if reset = '1' then 
 			--Default values:
@@ -54,9 +67,9 @@ begin
 			hit <= '0';
 			
 			-- Choose this value for simulating 'you win' state:
-         --invArray <=  "00000000000000000000" ;
-			-- Otherwise, this is the correct value:
-			invArray <= "00000000001111111111";
+         --invArray <=  "0000000000000000000000000000000000000000" ;
+			-- Otherwise, this is the correct value (for first level):
+			invArray <= "0000000000000000000001010101010101010101";
 			
 			-- Choose this value for simulating 'you lose' state:
 			-- invLine <= "1101";
@@ -73,7 +86,8 @@ begin
 			if (tick = '1') and (moving = '1') then
 				-- Moving to the right
 				if right = '0' then 
-					if invArray(19) = '1' then
+					-- Condition for reaching the end of the line: there is at least a '1' in either of the 2 final values
+					if invArray(39 downto 38) /= "00" then
 						right <= '1';
 						-- Prevent further movement if the end has been reached
 						if invLine /= "1110" then
@@ -82,12 +96,13 @@ begin
 							moving <= '0';
 						end if;
 					else
-						invArray <= invArray(18 downto 0) & '0';
+						invArray <= invArray(37 downto 0) & "00";
 					end if;
 				
 				-- Moving to the left
-				else                
-            if invArray(0) = '1' then
+				else
+					-- Condition for reaching the beginning of the line: there is at least a '1' in either of the 2 first positions				
+					if invArray(1 downto 0) /= "00" then
 						right <= '0';
 						-- Prevent further movement if the end has been reached
 						if invLine /= "1110" then
@@ -96,15 +111,18 @@ begin
 							moving <= '0';
 						end if;
 					else
-						invArray <= '0' & invArray(19 downto 1);
+						invArray <= "00" & invArray(39 downto 2);
 					end if;
 				end if;
 			end if;
 			
    		-- Checking for bullet
-   		if (bullY = invLine) and (invArray(to_integer(unsigned(bullX))) = '1') then
-            hit <= '1'; 	
-   			invArray(to_integer(unsigned(bullX))) <= '0';
+			-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
+			intBulletX := to_integer(unsigned(bullX))*2;
+   		if (bullY = invLine) and invArray( intBulletX + 1 downto intBulletX ) /= "00" then
+            hit <= '1';
+				-- Substract 1 to the alien power
+   			invArray( intBulletX+1 downto intBulletX ) <= std_logic_vector(unsigned( invArray( intBulletX+1 downto intBulletX )) - 1 );
    		else
    			hit <= '0';
    		end if ;
