@@ -47,7 +47,7 @@ architecture Behavioral of SpaceInv is
 		VGAx 	: in std_logic_vector (9 downto 0);
 		VGAy 	: in std_logic_vector (9 downto 0);
 		test 	: in std_logic;
-		invArray: in std_logic_vector (19 downto 0);
+		invArray: in std_logic_vector (39 downto 0);
 		invLine : in std_logic_vector (3 downto 0);
 		shipX	: in std_logic_vector (4 downto 0);
 		bullX 	: in std_logic_vector (4 downto 0);  
@@ -67,57 +67,29 @@ architecture Behavioral of SpaceInv is
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
          hit   : out std_logic;
-         invArray : inout std_logic_vector(19 downto 0);
+         invArray : inout std_logic_vector(39 downto 0);
 			invLine   : inout std_logic_vector(3 downto 0)
          ); 
 	end component;   
 
-	-- Component declaration for player spaceship control block:
-	COMPONENT spaceship
-	PORT (  
-			clk : in STD_LOGIC;
-			reset : in  STD_LOGIC;
-         left : in  STD_LOGIC;
-         right : in  STD_LOGIC;
-         enable : in  STD_LOGIC;
-         posH : out  STD_LOGIC_VECTOR (4 downto 0)
-		  );
-	END COMPONENT;
-	
-	-- Component declaration for button edge detector (with/without debouncing )
-	COMPONENT edgeDetector
-	PORT ( 
-			clk: in STD_LOGIC;
-			reset: in STD_LOGIC;
-			enable: in STD_LOGIC;
-			input: in STD_LOGIC;
-			detected: out STD_LOGIC 
-			);
-	END COMPONENT;
-	
-	COMPONENT edgeDetectorDebounce
-	PORT ( 
-			clk: in STD_LOGIC;
-			reset: in STD_LOGIC;
-			enable: in STD_LOGIC;
-			input: in STD_LOGIC;
-			detected: out STD_LOGIC 
-			);
-	END COMPONENT;
-	
-	
-	COMPONENT bullet
-   PORT (
-			clk      : in  std_logic;
-         reset    : in  std_logic;
-         hit      : in  std_logic;
-         disparo  : in  std_logic;
-         posH     : in  std_logic_vector(4 downto 0);
-         flying   : inout std_logic;   
-         bullX    : inout std_logic_vector(4 downto 0);
-         bullY    : inout std_logic_vector(3 downto 0)
-         ); 
-	END COMPONENT;
+	component player is
+   port ( 
+			  Right : in  STD_LOGIC;
+           Left  : in  STD_LOGIC;
+           Start : in  STD_LOGIC;
+           Shoot : in  STD_LOGIC;
+           clk   : in  STD_LOGIC;
+           Reset : in  STD_LOGIC;
+           Clear : in  STD_LOGIC;
+			  hit   : in  STD_LOGIC;
+           posShip      : out  STD_LOGIC_VECTOR (4 downto 0);
+           startPulse   : out  STD_LOGIC;
+           BulletX      : out  STD_LOGIC_VECTOR (4 downto 0);
+           BulletY      : out  STD_LOGIC_VECTOR (3 downto 0);
+           BulletActive : out  STD_LOGIC;
+           Score        : out  STD_LOGIC_VECTOR (7 downto 0)
+			  );
+	end component;
 	
 	-- Internal signals
 	signal RGB: STD_LOGIC_VECTOR (2 downto 0);
@@ -134,16 +106,16 @@ architecture Behavioral of SpaceInv is
 	signal bulletReset: STD_LOGIC;
 	
 	-- Inputs to ScreenFormat
-	signal invArray: std_logic_vector (19 downto 0);
+	signal invArray: std_logic_vector (39 downto 0);
 	signal invLine : std_logic_vector (3 downto 0);
+	
+	-- Player 1 signals:
+	signal startPulse: STD_LOGIC;
 	signal posH	: std_logic_vector (4 downto 0);
 	signal bullX 	: std_logic_vector (4 downto 0) := "11111";  
 	signal bullY 	: std_logic_vector (3 downto 0) := "1111";
 	signal bulletFlying  : std_logic;
-
-	-- Output from the edge detectors
-	signal leftDetected: STD_LOGIC;
-	signal rightDetected: STD_LOGIC;
+	signal Score:  STD_LOGIC_VECTOR (7 downto 0);
 	
 	-- State machine things:
 	type State is ( testState, Start, Playing, YouWin, YouLose );
@@ -191,46 +163,23 @@ begin
 					invLine => invLine
         			);	
 	
-	spaceshipControl: spaceship 
-		PORT MAP( 
-					clk => clk,
-					reset => spaceshipReset,
-					left => leftDetected,
-					right => rightDetected,
-					enable => '1',
-					posH => posH 
-					);
-				
-	leftEdgeDetector: edgeDetectorDebounce
-		PORT MAP(
-					clk => clk,
-					reset => leftDetectorReset,
-					enable => '1',
-					input => Izquierda,
-					detected => leftDetected
-					);
-					
-	rightEdgeDetector: edgeDetectorDebounce
-		PORT MAP(
-					clk => clk,
-					reset => rightDetectorReset,
-					enable =>  '1',
-					input => Derecha,
-					detected => rightDetected
-					);
-					
-	
-	laserGun: bullet
-		PORT MAP(
-				clk 		=> clk,
-				reset 	=> bulletReset,
-				hit   	=> hit,
-				disparo 	=>	Disparo, 
-				posH    	=> posH,
-				flying  	=> bulletFlying,   
-				bullX  	=> bullX,
-				bullY  	=> bullY
-				); 
+	player1: player
+	   PORT MAP ( 
+			  Right => Derecha,
+           Left  => Izquierda,
+           Start => Inicio,
+           Shoot => Disparo,
+           clk   => clk,
+           Reset => reset,
+           Clear => '0',
+			  hit => hit,
+           posShip => posH,
+           startPulse => startPulse,
+           BulletX    => bullX,
+           BulletY    => bullY,
+           BulletActive => bulletFlying,
+           Score        => Score
+			  );
    
 	-- Process for changing states:
 	process( clk, reset)
@@ -299,7 +248,7 @@ begin
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
-					elsif ( invArray = "00000000000000000000" ) then
+					elsif ( invArray = "0000000000000000000000000000000000000000" ) then
 						nextState <= YouWin;
 					elsif ( invLine = "1110" ) then
 						nextState <= YouLose;
