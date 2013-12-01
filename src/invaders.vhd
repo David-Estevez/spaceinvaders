@@ -22,6 +22,7 @@ use ieee.numeric_std.all;
 entity invaders is
    port (clk   : in  std_logic;
          reset : in  std_logic;
+			clear : in  std_logic;
 			start : in  std_logic;
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
@@ -45,6 +46,7 @@ architecture behavioral of invaders is
       port(
          clk   : in  std_logic;
          reset : in  std_logic;
+			clear : in  std_logic;
          en    : in  std_logic;
          q     : out std_logic
       );
@@ -53,8 +55,8 @@ architecture behavioral of invaders is
 begin
 	-- Instantiate a timer for invaders movement timing
    speedTimer: timer
-      generic  map (100) -- Set this to a value around 10 for a faster simulation
-      port map ( clk => clk, reset => reset, en => '1', q => tick );
+      generic  map (10) -- Set this to a value around 10 for a faster simulation
+      port map ( clk => clk, reset => reset, clear => clear, en => '1', q => tick );
 
 	-- Main process
    process (reset, clk)
@@ -69,7 +71,7 @@ begin
 			-- Choose this value for simulating 'you win' state:
          --invArray <=  "0000000000000000000000000000000000000000" ;
 			-- Otherwise, this is the correct value (for first level):
-			invArray <= "0000000000000000000001010101010101010101";
+			invArray <= "0000000000111110101001010101010101010101";
 			
 			-- Choose this value for simulating 'you lose' state:
 			-- invLine <= "1101";
@@ -78,55 +80,71 @@ begin
 			
 
       elsif clk'event and clk = '1' then
-      -- Sequential behaviors:
-			if (start = '1') then
-				moving <= '1'; -- Set this to '0' to stop the invaders when testing the bullet
-			end if;
+			if Clear = '1' then
+					--Default values:
+					moving <= '0';
+					right <= '0';
+					hit <= '0';
+			
+					-- Choose this value for simulating 'you win' state:
+					--invArray <=  "0000000000000000000000000000000000000000" ;
+					-- Otherwise, this is the correct value (for first level):
+					invArray <= "0000000000000000000001010101010101010101";
+			
+					-- Choose this value for simulating 'you lose' state:
+					-- invLine <= "1101";
+					-- Otherwise, this is the correct value:
+					invLine <= "0000"; 
+			else	
+				-- Sequential behaviors:
+				if (start = '1') then
+					moving <= '0'; -- Set this to '0' to stop the invaders when testing the bullet
+				end if;
 		
-			if (tick = '1') and (moving = '1') then
-				-- Moving to the right
-				if right = '0' then 
-					-- Condition for reaching the end of the line: there is at least a '1' in either of the 2 final values
-					if invArray(39 downto 38) /= "00" then
-						right <= '1';
-						-- Prevent further movement if the end has been reached
-						if invLine /= "1110" then
-							invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+				if (tick = '1') and (moving = '1') then
+					-- Moving to the right
+					if right = '0' then 
+						-- Condition for reaching the end of the line: there is at least a '1' in either of the 2 final values
+						if invArray(39 downto 38) /= "00" then
+							right <= '1';
+							-- Prevent further movement if the end has been reached
+							if invLine /= "1110" then
+								invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+							else
+								moving <= '0';
+							end if;
 						else
-							moving <= '0';
+							invArray <= invArray(37 downto 0) & "00";
 						end if;
-					else
-						invArray <= invArray(37 downto 0) & "00";
-					end if;
 				
-				-- Moving to the left
-				else
-					-- Condition for reaching the beginning of the line: there is at least a '1' in either of the 2 first positions				
-					if invArray(1 downto 0) /= "00" then
-						right <= '0';
-						-- Prevent further movement if the end has been reached
-						if invLine /= "1110" then
-							invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
-						else
-							moving <= '0';
-						end if;
+					-- Moving to the left
 					else
-						invArray <= "00" & invArray(39 downto 2);
+						-- Condition for reaching the beginning of the line: there is at least a '1' in either of the 2 first positions				
+						if invArray(1 downto 0) /= "00" then
+							right <= '0';
+							-- Prevent further movement if the end has been reached
+							if invLine /= "1110" then
+								invLine <= std_logic_vector(unsigned(invLine) + to_unsigned(1,4)); -- Invaders Line ++
+							else
+								moving <= '0';
+							end if;
+						else
+							invArray <= "00" & invArray(39 downto 2);
+						end if;
 					end if;
 				end if;
-			end if;
 			
-   		-- Checking for bullet
-			-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
-			intBulletX := to_integer(unsigned(bullX))*2;
-   		if (bullY = invLine) and invArray( intBulletX + 1 downto intBulletX ) /= "00" then
-            hit <= '1';
-				-- Substract 1 to the alien power
-   			invArray( intBulletX+1 downto intBulletX ) <= std_logic_vector(unsigned( invArray( intBulletX+1 downto intBulletX )) - 1 );
-   		else
-   			hit <= '0';
-   		end if ;
-   			
+				-- Checking for bullet
+				-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
+				intBulletX := to_integer(unsigned(bullX))*2;
+				if (bullY = invLine) and invArray( intBulletX + 1 downto intBulletX ) /= "00" then
+					hit <= '1';
+					-- Substract 1 to the alien power
+					invArray( intBulletX+1 downto intBulletX ) <= std_logic_vector(unsigned( invArray( intBulletX+1 downto intBulletX )) - 1 );
+				else
+					hit <= '0';
+				end if ;
+   		end if;	
 		end if; 	
 			
    end process;

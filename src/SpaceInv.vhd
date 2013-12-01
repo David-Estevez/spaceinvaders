@@ -17,6 +17,7 @@ entity SpaceInv is
 			  Inicio: in STD_LOGIC; 
            Izquierda, Derecha: in STD_LOGIC;
 			  Disparo: in STD_LOGIC;
+			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
 			  HSync : out  STD_LOGIC;
            VSync : out  STD_LOGIC;
            R,G,B : out  STD_LOGIC
@@ -63,6 +64,7 @@ architecture Behavioral of SpaceInv is
    port (
 			clk   : in  std_logic;
          reset : in  std_logic;
+			clear : in  std_logic;
 			start : in  std_logic;
          bullX : in  std_logic_vector(4 downto 0);
          bullY : in  std_logic_vector(3 downto 0);
@@ -98,12 +100,9 @@ architecture Behavioral of SpaceInv is
 	signal hit: STD_LOGIC;
 	signal testEnable: STD_LOGIC;
 	
-	-- Reset lines:
-	signal leftDetectorReset: STD_LOGIC;
-	signal rightDetectorReset: STD_LOGIC;
-	signal invadersReset: STD_LOGIC;
-	signal spaceshipReset: STD_LOGIC;
-	signal bulletReset: STD_LOGIC;
+	-- Clear lines:
+	signal playerClear: STD_LOGIC;
+	signal invadersClear: STD_LOGIC;
 	
 	-- Inputs to ScreenFormat
 	signal invArray: std_logic_vector (39 downto 0);
@@ -154,7 +153,8 @@ begin
 	badGuys: invaders
 		PORT MAP(
 					clk => clk,
-					reset => invadersReset,
+					reset => Reset,
+					Clear => invadersClear,
 					start => inicio,
 					bullX => bullX,
 					bullY => bullY,
@@ -171,7 +171,7 @@ begin
            Shoot => Disparo,
            clk   => clk,
            Reset => reset,
-           Clear => '0',
+           Clear => playerClear,
 			  hit => hit,
            posShip => posH,
            startPulse => startPulse,
@@ -205,11 +205,8 @@ begin
 					-- Set outputs:
 					testEnable <= '1';
 					specialScreen <= "000";
-					leftDetectorReset <= '1';
-					rightDetectorReset <= '1';
-					invadersReset <= '1';
-					spaceshipReset <= '1';
-					bulletReset <= '1';
+					invadersClear <= '1';
+					playerClear <= '1';
 					
 					-- Next state:
 					if ( Test = '0' ) then
@@ -221,11 +218,8 @@ begin
 					-- Set outputs:
 					testEnable <= '0';
 					specialScreen <= "000";
-					leftDetectorReset <= '1';
-					rightDetectorReset <= '1';
-					invadersReset <= '1';
-					spaceshipReset <= '1';
-					bulletReset <= '1';
+					invadersClear <= '1';
+					playerClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
@@ -239,11 +233,8 @@ begin
 					-- Set outputs:
 					testEnable <= '0';
 					specialScreen <= "000";
-					leftDetectorReset <= '0';
-					rightDetectorReset <= '0';
-					invadersReset <= '0';
-					spaceshipReset <= '0';
-					bulletReset <= '0';
+					invadersClear <= '0';
+					playerClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -259,11 +250,8 @@ begin
 					-- Set outputs:
 					testEnable <= '0';
 					specialScreen <= "001";
-					leftDetectorReset <= '0';
-					rightDetectorReset <= '0';
-					invadersReset <= '1';
-					spaceshipReset <= '1';
-					bulletReset <= '1';
+					invadersClear <= '1';
+					playerClear <= '1';
 										
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -277,11 +265,8 @@ begin
 					-- Set outputs:
 					testEnable <= '0';
 					specialScreen <= "010";
-					leftDetectorReset <= '0';
-					rightDetectorReset <= '0';
-					invadersReset <= '1';
-					spaceshipReset <= '1';
-					bulletReset <= '1';
+					invadersClear <= '1';
+					playerClear <= '1';
 					
 					-- Next state:
 					if ( Test = '1' ) then
@@ -291,6 +276,16 @@ begin
 					end if;
 			end case;
 		end process;
+		
+		-- Show score on the leds:
+		LED0 <= score(0);
+		LED1 <= score(1);
+		LED2 <= score(2);
+		LED3 <= score(3);
+		LED4 <= score(4);
+		LED5 <= score(5);
+		LED6 <= score(6);
+		LED7 <= score(7);
 		
 end Behavioral;
 

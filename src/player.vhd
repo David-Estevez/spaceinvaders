@@ -38,6 +38,7 @@ architecture Structural of player is
 	PORT (  
 			clk : in STD_LOGIC;
 			reset : in  STD_LOGIC;
+			clear: in  STD_LOGIC;
          left : in  STD_LOGIC;
          right : in  STD_LOGIC;
          enable : in  STD_LOGIC;
@@ -50,6 +51,7 @@ architecture Structural of player is
 	PORT ( 
 			clk: in STD_LOGIC;
 			reset: in STD_LOGIC;
+			clear: in STD_LOGIC;
 			enable: in STD_LOGIC;
 			input: in STD_LOGIC;
 			detected: out STD_LOGIC 
@@ -61,6 +63,7 @@ architecture Structural of player is
 	PORT ( 
 			clk: in STD_LOGIC;
 			reset: in STD_LOGIC;
+			clear: in STD_LOGIC;
 			enable: in STD_LOGIC;
 			input: in STD_LOGIC;
 			detected: out STD_LOGIC 
@@ -72,8 +75,9 @@ architecture Structural of player is
    PORT (
 			clk      : in  std_logic;
          reset    : in  std_logic;
+			clear		: in  std_logic;
          hit      : in  std_logic;
-         disparo  : in  std_logic;
+         shoot    : in  std_logic;
          posH     : in  std_logic_vector(4 downto 0);
          flying   : out std_logic;   
          bullX    : out std_logic_vector(4 downto 0);
@@ -91,6 +95,7 @@ begin
 		PORT MAP( 
 					clk => clk,
 					reset => Reset,
+					clear => clear,
 					left => leftDetected,
 					right => rightDetected,
 					enable => '1',
@@ -101,6 +106,7 @@ begin
 		PORT MAP(
 					clk => clk,
 					reset => Reset,
+					clear => clear,
 					enable => '1',
 					input => Left,
 					detected => leftDetected
@@ -110,6 +116,7 @@ begin
 		PORT MAP(
 					clk => clk,
 					reset => Reset,
+					clear => clear,
 					enable =>  '1',
 					input => Right,
 					detected => rightDetected
@@ -119,6 +126,7 @@ begin
 			PORT MAP(
 					clk => clk,
 					reset => Reset,
+					clear => '0',
 					enable =>  '1',
 					input => Start,
 					detected => startPulse
@@ -128,8 +136,9 @@ begin
 		PORT MAP(
 				clk 		=> clk,
 				reset 	=> Reset,
+				clear		=> clear,
 				hit   	=> hit,
-				disparo 	=>	Shoot, 
+				shoot 	=>	Shoot, 
 				posH    	=> posHBus,
 				flying	=> BulletActive,   
 				bullX  	=> BulletX,

@@ -21,6 +21,7 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
          Izquierda : IN  std_logic;
          Derecha : IN  std_logic;
 			Disparo: IN std_logic;
+			LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
          HSync : OUT  std_logic;
          VSync : OUT  std_logic;
          R : OUT  std_logic;
@@ -40,6 +41,7 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
 	signal Disparo : std_logic := '0';
 
  	--Outputs
+	signal LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: STD_LOGIC;
    signal HSync : std_logic;
    signal VSync : std_logic;
    signal R : std_logic;
@@ -61,6 +63,8 @@ BEGIN
           Izquierda => Izquierda,
           Derecha => Derecha,
 			 Disparo => Disparo,
+			 LED0 => LED0, LED1 => LED1, LED2 => LED2, LED3 => LED3,
+			 LED4 => LED4, LED5 => LED5, LED6 => LED6, LED7 => LED7,
           HSync => HSync,
           VSync => VSync,
           R => R,
