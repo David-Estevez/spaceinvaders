@@ -52,28 +52,36 @@ begin
 	-- Sound selection
    process (reset, clk) 
    begin
-		if 	(a = '1') then
-			startPeriod <= 100;
-			endPeriod	<= 10000;
-			toneStart 	<= '1'; 
-		elsif (b = '1') then
-			startPeriod <= 100;
-			endPeriod	<= 10000;
-			toneStart 	<= '1'; 
-		elsif (c = '1') then
-			startPeriod <= 1000;
+		if reset = '1' then 
+         startPeriod <= 1000;
 			endPeriod	<= 1000;
-			toneStart 	<= '1'; 
-		elsif (d = '1') then
-			startPeriod <= 1000;
-			endPeriod	<= 1000;
-			toneStart 	<= '1'; 
-		else
-			toneStart <= '0'; 
-		
+			toneStart 	<= '0';
+			
+      elsif clk'event and clk = '1' then
+			if 	(a = '1') then
+				startPeriod <= 100;
+				endPeriod	<= 10000;
+				toneStart 	<= '1'; 
+			elsif (b = '1') then
+				startPeriod <= 10000;
+				endPeriod	<= 100;
+				toneStart 	<= '1'; 
+			elsif (c = '1') then
+				startPeriod <= 1000;
+				endPeriod	<= 500;
+				toneStart 	<= '1'; 
+			elsif (d = '1') then
+				startPeriod <= 500;
+				endPeriod	<= 1000;
+				toneStart 	<= '1'; 
+			else
+				toneStart <= '0'; 
+			end if;
 		end if;
 		
 	end process;
+	
+	
 	-- Tone generation
    process (reset, clk) 
    begin
@@ -116,7 +124,5 @@ process (reset, clk)
 			
       end if; 
    end process;
-	
-	-- Multiplexing
 
 end behavioral;
