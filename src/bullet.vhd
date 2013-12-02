@@ -34,7 +34,7 @@ architecture behavioral of bullet is
 begin
 	
    speedTimer: timer
-      generic  map (100) -- Period of movement in ms
+      generic  map (50) -- Period of movement in ms
       port     map (
          clk => clk,
          reset => reset,
@@ -62,6 +62,7 @@ begin
          -- Check if we have killed any invader
          if (hit = '1') then
             flying <= '0';
+				bullY <= std_logic_vector(to_unsigned(14,4));
          end if;
 
          -- Moving up!
@@ -69,6 +70,7 @@ begin
             if bully = std_logic_vector(to_unsigned(0,4)) then
                -- We have reached the top of the screen
                flying <= '0';
+					bullY <= std_logic_vector(to_unsigned(14,4));
             else     
                bullY <= std_logic_vector(unsigned(bullY) - to_unsigned(1,4));
             end if;
