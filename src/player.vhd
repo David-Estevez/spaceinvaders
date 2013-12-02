@@ -91,7 +91,7 @@ architecture Structural of player is
 	signal posHBus: std_logic_vector( 4 downto 0);
 	
 begin
-	spaceshipControl: spaceship 
+	spaceshipControl: spaceship
 		PORT MAP( 
 					clk => clk,
 					reset => Reset,

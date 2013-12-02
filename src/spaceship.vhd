@@ -25,17 +25,19 @@ architecture Behavioral of spaceship is
 
 begin
 	process( reset, clk )
-		variable posHAux: integer range 0 to 19 := 9; -- To be able to update the ship position
+		variable posHAux: integer range 0 to 19; -- To be able to update the ship position
 	begin
 		-- High level reset
 		if reset = '1' then
-			posH <= "00111"; -- Center the ship
 			posHAux := 9;
+			posH <= std_logic_vector( to_unsigned( posHAux, 5) ); --"00111"; -- Center the ship
 		-- Synchronous behaviour
 		elsif clk'Event and clk = '1' then
+			-- Clear
 			if Clear = '1' then
-				posH <= "00111"; -- Center the ship
-				posHAux := 9;
+			posHAux := 9;
+			posH <= std_logic_vector( to_unsigned( posHAux, 5) ); --"00111"; -- Center the ship
+			-- When enabled...
 			elsif enable = '1' then
 				-- Move left/right if possible
 				if left = '1' and posHAux /= 0 then

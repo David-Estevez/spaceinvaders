@@ -41,7 +41,7 @@ architecture behavioral of invaders is
    signal tick  : std_logic; -- Signal from timer
 	signal moving : std_logic; 
 	
-	--signal internalInvArray: std_logic_vector(19 downto 0);
+	constant initArray : std_logic_vector(39 downto 0) := "0000000000000000000001010110111111100101";
 	--signal internalInvLine: std_logic_vector( 3 downto 0);
 
    component timer
@@ -58,13 +58,14 @@ architecture behavioral of invaders is
 begin
 	-- Instantiate a timer for invaders movement timing
    speedTimer: timer
-      generic  map (10) -- Set this to a value around 10 for a faster simulation
+      generic  map (200) -- Set this to a value around 10 for a faster simulation
       port map ( clk => clk, reset => reset, clear => clear, en => '1', q => tick );
 
 	-- Main process
    process (reset, clk)
 		variable intBulletX1: integer; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
 		variable intBulletX2: integer; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
+		variable currentInvader: std_logic_vector(1 downto 0);
    begin
       if reset = '1' then 
 			--Default values:
@@ -76,7 +77,7 @@ begin
 			-- Choose this value for simulating 'you win' state:
          --invArray <=  "0000000000000000000000000000000000000000" ;
 			-- Otherwise, this is the correct value (for first level):
-			invArray <= "0000000000111110101001010101010101010101";
+			invArray <= initArray;
 			
 			-- Choose this value for simulating 'you lose' state:
 			-- invLine <= "1101";
@@ -95,7 +96,7 @@ begin
 					-- Choose this value for simulating 'you win' state:
 					--invArray <=  "0000000000000000000000000000000000000000" ;
 					-- Otherwise, this is the correct value (for first level):
-					invArray <= "0000000000000000000001010101010101010101";
+					invArray <= initArray;
 			
 					-- Choose this value for simulating 'you lose' state:
 					-- invLine <= "1101";
@@ -104,7 +105,7 @@ begin
 			else	
 				-- Sequential behaviors:
 				if (start = '1') then
-					moving <= '0'; -- Set this to '0' to stop the invaders when testing the bullet
+					moving <= '1'; -- Set this to '0' to stop the invaders when testing the bullet
 				end if;
 		
 				if (tick = '1') and (moving = '1') then
@@ -145,8 +146,15 @@ begin
 				intBulletX1 := to_integer(unsigned(bullX1))*2;
 				if (bullY1 = invLine) and invArray( intBulletX1 + 1 downto intBulletX1 ) /= "00" then
 					hit1 <= '1';
-					-- Substract 1 to the alien power
-					invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
+					-- Substract 1 to the alien power7
+					currentInvader := invArray( intBulletX1+1 downto intBulletX1 ) ;
+					case currentInvader is
+						when "01" => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+						when "10" => invArray( intBulletX1+1 downto intBulletX1 ) <= "01";
+						when "11" => invArray( intBulletX1+1 downto intBulletX1 ) <= "10";
+						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+					end case;
+					--invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
 				else
 					hit1 <= '0';
 				end if ;
@@ -157,7 +165,14 @@ begin
 				if (bullY2 = invLine) and invArray( intBulletX2 + 1 downto intBulletX2 ) /= "00" then
 					hit2 <= '1';
 					-- Substract 1 to the alien power
-					invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
+					currentInvader := invArray( intBulletX2+1 downto intBulletX2 ) ;
+					case currentInvader is
+						when "01" => invArray( intBulletX2+1 downto intBulletX2 ) <= "00";
+						when "10" => invArray( intBulletX2+1 downto intBulletX2 ) <= "01";
+						when "11" => invArray( intBulletX2+1 downto intBulletX2 ) <= "10";
+						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+					end case;
+					--invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
 				else
 					hit2 <= '0';
 				end if ;

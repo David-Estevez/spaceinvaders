@@ -15,8 +15,8 @@ entity SpaceInv is
            reset : in  STD_LOGIC;
 			  Test: in STD_LOGIC; 	 
 			  Inicio: in STD_LOGIC; 
-           Izquierda, Derecha: in STD_LOGIC;
-			  Disparo: in STD_LOGIC;
+           left1, right1, start1, shoot1: in STD_LOGIC;
+           left2, right2, start2, shoot2: in STD_LOGIC;			  
 			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
 			  HSync : out  STD_LOGIC;
            VSync : out  STD_LOGIC;
@@ -83,6 +83,9 @@ architecture Behavioral of SpaceInv is
 	end component;   
 
 	component player is
+	generic ( 
+				shipStartPos : integer := 9
+			  );
    port ( 
 			  Right : in  STD_LOGIC;
            Left  : in  STD_LOGIC;
@@ -111,6 +114,7 @@ architecture Behavioral of SpaceInv is
 	signal player1Clear: STD_LOGIC;
 	signal player2Clear: STD_LOGIC;
 	signal invadersClear: STD_LOGIC;
+	signal invadersStart: STD_LOGIC;
 	
 	-- Inputs to ScreenFormat
 	signal invArray: std_logic_vector (39 downto 0);
@@ -186,7 +190,7 @@ begin
 					clk => clk,
 					reset => Reset,
 					Clear => invadersClear,
-					start => inicio,
+					start => invadersStart,
 					bullX1 => p1bullX,
 					bullY1 => p1bullY,
 					hit1 => p1hit,
@@ -234,10 +238,15 @@ begin
 			  );
    
 	-- Linking external I/O lines with players:
-	p1right <= Derecha;
-	p1left <= Izquierda;
-	p1start <= Inicio;
-	p1shoot <= Disparo;
+	p1right <= right1;
+	p1left <= left1;
+	p1start <= start1;
+	p1shoot <= shoot1;
+	
+	p2right <= right2;
+	p2left <= left2;
+	p2start <= start2;
+	p2shoot <= shoot2;
 	
 	-- Process for changing states:
 	process( clk, reset)
@@ -264,6 +273,7 @@ begin
 					testEnable <= '1';
 					specialScreen <= "000";
 					invadersClear <= '1';
+					invadersStart <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
 					
@@ -278,6 +288,7 @@ begin
 					testEnable <= '0';
 					specialScreen <= "000";
 					invadersClear <= '1';
+					invadersStart <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';					
 					
@@ -294,6 +305,7 @@ begin
 					testEnable <= '0';
 					specialScreen <= "000";
 					invadersClear <= '0';
+					invadersStart <= '1';
 					player1Clear <= '0';
 					player2Clear <= '0';
 					
@@ -312,6 +324,7 @@ begin
 					testEnable <= '0';
 					specialScreen <= "001";
 					invadersClear <= '1';
+					invadersStart <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
 										
@@ -328,6 +341,7 @@ begin
 					testEnable <= '0';
 					specialScreen <= "010";
 					invadersClear <= '1';
+					invadersStart <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
 					

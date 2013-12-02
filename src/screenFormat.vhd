@@ -253,7 +253,7 @@ begin
 						end if;
 						
 					-- Show ship 2 in cyan
-					elsif player2enable = '1' and (x = shipX1) and (y = std_logic_vector(to_unsigned(14,4))) then
+					elsif player2enable = '1' and (x = shipX2) and (y = std_logic_vector(to_unsigned(14,4))) then
 						if ship_sprite( 31-indY, 31-indX) = '1' then
 							rgb <= CYAN;
 						else
