@@ -9,12 +9,12 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity SpaceInv is
     Port ( clk : in  STD_LOGIC;
            reset : in  STD_LOGIC;
 			  Test: in STD_LOGIC; 	 
-			  Inicio: in STD_LOGIC; 
            left1, right1, start1, shoot1: in STD_LOGIC;
            left2, right2, start2, shoot2: in STD_LOGIC;			  
 			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
@@ -54,7 +54,7 @@ architecture Behavioral of SpaceInv is
 		bullX1 	: in std_logic_vector (4 downto 0);  
 		bullY1 	: in std_logic_vector (3 downto 0);
 		bulletFlying1: in std_logic;
-		player2enable : in std_logic;
+		player2shown : in std_logic;
 		shipX2	: in std_logic_vector (4 downto 0);
 		bullX2 	: in std_logic_vector (4 downto 0);  
 		bullY2 	: in std_logic_vector (3 downto 0);
@@ -78,53 +78,70 @@ architecture Behavioral of SpaceInv is
          bullY2 : in  std_logic_vector(3 downto 0);
          hit2   : out std_logic;
          invArray : inout std_logic_vector(39 downto 0);
-			invLine   : inout std_logic_vector(3 downto 0)
+			invLine   : inout std_logic_vector(3 downto 0);
+			level  : in  std_logic_vector( 2 downto 0 )
          ); 
 	end component;   
 
+	-- Declaration of component player
 	component player is
-	generic ( 
-				shipStartPos : integer := 9
-			  );
    port ( 
+				-- User controls
 			  Right : in  STD_LOGIC;
            Left  : in  STD_LOGIC;
            Start : in  STD_LOGIC;
            Shoot : in  STD_LOGIC;
-           clk   : in  STD_LOGIC;
-           Reset : in  STD_LOGIC;
-           Clear : in  STD_LOGIC;
-			  hit   : in  STD_LOGIC;
+			  
+			  -- Control signals
+           clk      	 : in  STD_LOGIC;
+           Reset 		 : in  STD_LOGIC;
+           Clear 		 : in  STD_LOGIC;
+			  ScoreClear : in STD_LOGIC;
+			  Enable		 : in  STD_LOGIC;
+			  
+			  -- Internal signals
+			  hit	  			: in  STD_LOGIC;
            posShip      : out  STD_LOGIC_VECTOR (4 downto 0);
            startPulse   : out  STD_LOGIC;
            BulletX      : out  STD_LOGIC_VECTOR (4 downto 0);
            BulletY      : out  STD_LOGIC_VECTOR (3 downto 0);
            BulletActive : out  STD_LOGIC;
            Score        : out  STD_LOGIC_VECTOR (7 downto 0)
-			  );
+		  );
 	end component;
 	
-	-- Internal signals
+	
+	-- Clear lines:
+	----------------------------------------------------
+	signal player1Clear: STD_LOGIC;
+	signal p1ScoreClear: STD_LOGIC;
+	signal player2Clear: STD_LOGIC;
+	signal p2ScoreClear: STD_LOGIC;
+	signal invadersClear: STD_LOGIC;
+	
+	-- Inputs to ScreenFormat
+	----------------------------------------------------
 	signal RGB: STD_LOGIC_VECTOR (2 downto 0);
 	signal X, Y: STD_LOGIC_VECTOR (9 downto 0);
 	signal specialScreen: STD_LOGIC_VECTOR( 2 downto 0);
 	signal testEnable: STD_LOGIC;
-	
-	-- Clear lines:
-	signal player1Clear: STD_LOGIC;
-	signal player2Clear: STD_LOGIC;
-	signal invadersClear: STD_LOGIC;
-	signal invadersStart: STD_LOGIC;
-	
-	-- Inputs to ScreenFormat
 	signal invArray: std_logic_vector (39 downto 0);
 	signal invLine : std_logic_vector (3 downto 0);
 	
+	-- Invaders trigger:
+	----------------------------------------------------
+	signal invadersStart: STD_LOGIC;
+	
 	-- Player 1 signals:
+	----------------------------------------------------
+	-- User control signals
 	signal p1right: std_logic;
 	signal p1left: std_logic;
 	signal p1start: std_logic;
 	signal p1shoot: std_logic;
+	signal p1enable: std_logic;
+	
+	-- Internal signals
 	signal p1startPulse: std_logic;
 	signal p1posH	: std_logic_vector (4 downto 0);
 	signal p1hit : std_logic;
@@ -134,10 +151,15 @@ architecture Behavioral of SpaceInv is
 	signal p1Score:  std_logic_vector (7 downto 0);
 	
 	-- Player 2 signals
+	---------------------------------------------------
+	-- User control signals	
 	signal p2right: std_logic;
 	signal p2left: std_logic;
 	signal p2start: std_logic;
 	signal p2shoot: std_logic;
+	signal p2enable: std_logic;
+	
+	-- Internal signals
 	signal p2startPulse: std_logic;
 	signal p2posH	: std_logic_vector (4 downto 0);
 	signal p2hit : std_logic;
@@ -147,8 +169,15 @@ architecture Behavioral of SpaceInv is
 	signal p2Score:  std_logic_vector (7 downto 0);
 	
 	-- State machine things:
-	type State is ( testState, Start, Playing, YouWin, YouLose );
+	------------------------------------------------------
+	type State is ( testState, Start, Playing, YouWin, YouLose, WinGame );
 	signal currentState, nextState: State;
+	
+	-- Level control:
+	------------------------------------------------------
+	signal level: std_logic_vector( 2 downto 0 );
+	signal levelClear: std_logic;
+	signal levelUp: std_logic;
 
 begin
 	vgaController: vga 
@@ -176,7 +205,7 @@ begin
 					bullX1 			=> p1bullX,
 					bullY1 			=> p1bullY,
 					bulletFlying1  => p1bulletFlying,
-					player2enable  => '1',
+					player2shown   => '1',
 					shipX2	 		=> p2posH,
 					bullX2 			=> p2bullX,
 					bullY2 			=> p2bullY,
@@ -198,7 +227,8 @@ begin
 					bullY2 => p2bullY,
 					hit2 => p2hit,
 					invArray => invArray,
-					invLine => invLine
+					invLine => invLine,
+					level => level
         			);	
 	
 	player1: player
@@ -210,6 +240,8 @@ begin
            clk   => clk,
            Reset => reset,
            Clear => player1Clear,
+			  ScoreClear => p1ScoreClear,
+			  Enable => p1Enable,
 			  hit => p1hit,
            posShip => p1posH,
            startPulse => p1startPulse,
@@ -228,6 +260,8 @@ begin
            clk   => clk,
            Reset => reset,
            Clear => player2Clear,
+			  ScoreClear => p2ScoreClear,
+			  Enable => p2Enable,
 			  hit => p2hit,
            posShip => p2posH,
            startPulse => p2startPulse,
@@ -270,44 +304,82 @@ begin
 				when testState=> 
 					-- Show checkerboard pattern
 					-- Set outputs:
+					-----------------------------
+					-- Special signals
 					testEnable <= '1';
 					specialScreen <= "000";
+					-- Invaders signals
 					invadersClear <= '1';
 					invadersStart <= '0';
+					-- Player signals
+					p1Enable <= '0';
+					p2Enable <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
+					p1ScoreClear <= '1';
+					p2ScoreClear <= '1';
+					-- Level control
+					levelUp <= '0';
+					levelClear <= '1';
 					
 					-- Next state:
 					if ( Test = '0' ) then
 						nextState <= Start;
+					else
+						nextState <= currentState;
 					end if;
 				
 				when Start =>
 					-- Wait for user to start the game
 					-- Set outputs:
+					-----------------------------
+					-- Special signals
 					testEnable <= '0';
 					specialScreen <= "000";
+					-- Invaders signals
 					invadersClear <= '1';
 					invadersStart <= '0';
-					player1Clear <= '0';
-					player2Clear <= '0';					
+					-- Player signals
+					p1Enable <= '0';
+					player1Clear <= '1';
+					player2Clear <= '1';
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					-- Level control
+					levelUp <= '0';
+					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( p1start = '1' or p2start = '1') then
+					elsif ( p1start = '1' ) then 
 						nextState <= Playing;
+					elsif ( p2start = '1' ) then
+						p2Enable <= '1';
+						nextState <= Start;
+					else
+						nextState <= currentState;
 					end if;
 				
 				when Playing =>
 					-- Playing the game
 					-- Set outputs:
+					-----------------------------
+					-- Special signals
 					testEnable <= '0';
 					specialScreen <= "000";
+					-- Invaders signals
 					invadersClear <= '0';
 					invadersStart <= '1';
+					-- Player signals
+					p1Enable <= '1';
 					player1Clear <= '0';
 					player2Clear <= '0';
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					-- Level control
+					levelUp <= '0';
+					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -316,44 +388,149 @@ begin
 						nextState <= YouWin;
 					elsif ( invLine = "1110" ) then
 						nextState <= YouLose;
+					else
+						nextState <= currentState;
 					end if;
 
 				when YouWin =>
 					-- Winning screen 
 					-- Set outputs:
+					-----------------------------
+					-- Special signals
 					testEnable <= '0';
 					specialScreen <= "001";
+					-- Invaders signals
 					invadersClear <= '1';
 					invadersStart <= '0';
-					player1Clear <= '1';
-					player2Clear <= '1';
+					-- Player signals
+					p1Enable <= '0';
+					player1Clear <= '0';
+					player2Clear <= '0';
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					-- Level control
+					levelUp <= '1';
+					levelClear <= '0';
 										
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
+					elsif ( (p1start = '1') or (p2start = '1')) and (level = "111" ) then
+						nextState <= WinGame;
 					elsif ( p1start = '1' or p2start = '1' ) then
 						nextState <= Start;
+					else
+						nextState <= currentState;
 					end if;
 					
 				when YouLose =>
 					-- Losing screen
 					-- Set outputs:
+					-----------------------------
+					-- Special signals
 					testEnable <= '0';
 					specialScreen <= "010";
+					-- Invaders signals
 					invadersClear <= '1';
 					invadersStart <= '0';
-					player1Clear <= '1';
-					player2Clear <= '1';
+					-- Player signals
+					p1Enable <= '0';
+					p2Enable <= '0';
+					player1Clear <= '0';
+					player2Clear <= '0';
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					-- Level control
+					levelUp <= '0';
+					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
 					elsif ( p1start = '1' or p2start = '1' ) then
+						-- Reset scores and level
+						p1ScoreClear <= '1';
+						p2ScoreClear <= '1';
+						levelClear <= '1';
+						p2Enable <= '0';
+						
 						nextState <= Start;
+					else
+						nextState <= currentState;
 					end if;
+					
+				when WinGame =>
+					-- Win game screen
+					-- Set outputs:
+					-----------------------------
+					-- Special signals
+					testEnable <= '0';
+					specialScreen <= "011";
+					-- Invaders signals
+					invadersClear <= '1';
+					invadersStart <= '0';
+					-- Player signals
+					p1Enable <= '0';
+					p2Enable <= '0';
+					player1Clear <= '0';
+					player2Clear <= '0';
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					-- Level control
+					levelUp <= '0';
+					levelClear <= '0';
+					
+					-- Next state:
+					if ( Test = '1' ) then
+						nextState <= testState;
+					elsif ( p1start = '1' or p2start = '1' ) then
+						-- Reset scores and level
+						p1ScoreClear <= '1';
+						p2ScoreClear <= '1';
+						levelClear <= '1';
+						p2Enable <= '0';
+						
+						nextState <= Start;
+					else
+						nextState <= currentState;
+					end if;
+					
+				when others =>					
+					-- Next state:
+					nextState <= Start;
+					
 			end case;
 		end process;
 		
+		-- Process controlling the level
+		process( clk, Reset)
+			variable intLevel : integer range 0 to 7;
+			variable previousLevelUp: std_logic;
+		begin
+			-- Counter for the level (counts edges)
+			-- Reset
+			if  Reset = '1' then
+				intLevel := 0;
+				previousLevelUp := '0';
+				
+			elsif clk'event and clk = '1' then
+				-- Clear
+				if levelClear = '1' then
+					intLevel := 0;
+				-- Up counter
+				elsif levelUp = '1' and previousLevelUp = '0' and intLevel /= 7 then
+					intLevel := intLevel + 1;
+				end if;
+				
+				-- Store the last value
+				previousLevelUp := levelUp;
+				
+			end if;
+			
+			level <= std_logic_vector( to_unsigned( intLevel, 3));
+		end process;
+			
+
 		-- Show score on the leds:
 		LED0 <= p1score(0);
 		LED1 <= p1score(1);

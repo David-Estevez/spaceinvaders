@@ -21,7 +21,6 @@ end bullet;
 
 architecture behavioral of bullet is
    signal tick  : std_logic; -- Signal from timer
-	signal intflying: std_logic;
 	signal intbullX: 	std_logic_vector( 4 downto 0);
 	signal intbullY:	std_logic_vector( 3 downto 0);
 
@@ -48,30 +47,30 @@ begin
    );
 
    process (reset, clk)
-		
+		variable intflying: std_logic;
    begin
       if reset = '1' then 
          intbullX <= std_logic_vector(to_unsigned(0,5));
          intbullY <= std_logic_vector(to_unsigned(14,4));
-         intflying <= '0';
+         intflying := '0';
 
       elsif clk'event and clk = '1' then
       -- Sequential behaviors:
 			if clear = '1' then
 				intbullX <= std_logic_vector(to_unsigned(0,5));
 				intbullY <= std_logic_vector(to_unsigned(14,4));
-				intflying <= '0';
+				intflying := '0';
 			else
 				-- Shoot the bullet
 				if ((intflying = '0') and (shoot = '1')) then
-					intflying <= '1';  -- bullet moving
+					intflying := '1';  -- bullet moving
 					intbullX <= posH; -- starting just over the ship
 					intbullY <= std_logic_vector(to_unsigned(13,4));
 				end if;
 
 				-- Check if we have killed any invader
 				if (hit = '1') then
-					intflying <= '0';
+					intflying := '0';
 					intbullY <= std_logic_vector(to_unsigned(14,4));
 				end if;
 
@@ -79,7 +78,7 @@ begin
 				if (tick = '1') and (intflying = '1') then
 					if intbullY = std_logic_vector(to_unsigned(0,4)) then
 						-- We have reached the top of the screen
-						intflying <= '0';
+						intflying := '0';
 						intbullY <= std_logic_vector(to_unsigned(14,4));
 					else     
 						intbullY <= std_logic_vector(unsigned(intbullY) - to_unsigned(1,4));

@@ -25,7 +25,7 @@ port (
 	bullX1 	: in std_logic_vector (4 downto 0);  
 	bullY1 	: in std_logic_vector (3 downto 0);
 	bulletFlying1: in std_logic;
-	player2enable : in std_logic;
+	player2shown : in std_logic;
 	shipX2	: in std_logic_vector (4 downto 0);
 	bullX2 	: in std_logic_vector (4 downto 0);  
 	bullY2 	: in std_logic_vector (3 downto 0);
@@ -41,7 +41,7 @@ architecture behavioral of screenFormat is
 	signal y : std_logic_vector (3 downto 0); -- 0 to 14
 
 	-- game sprites:
-	type sprite is array( 31 downto 0, 31 downto 0) of std_logic; 
+	type sprite is array( 0 to 31, 0 to 31) of std_logic; 
 	
 	CONSTANT alien1: sprite := ( 
 													"00000000000000000000000000000000",
@@ -230,15 +230,15 @@ begin
 					
 					-- Show player 1 bullet in red
 					if bulletFlying1 = '1' and (x = bullX1) and (y = bullY1) then
-						if funny_bullet( 31-indY, 31-indX) = '1' then
+						if funny_bullet( indY, indX) = '1' then
 							rgb <= RED;
 						else
 							rgb <= BLACK;
 						end if;
 					
 					-- Show player 2 bullet in magenta
-					elsif player2enable = '1' and bulletFlying2 = '1' and (x = bullX2) and (y = bullY2) then
-						if funny_bullet( 31-indY, 31-indX) = '1' then
+					elsif player2shown  = '1' and bulletFlying2 = '1' and (x = bullX2) and (y = bullY2) then
+						if funny_bullet( indY, indX) = '1' then
 							rgb <= MAGENTA;
 						else
 							rgb <= BLACK;
@@ -246,15 +246,15 @@ begin
 						
 					-- Show ship 1 in blue		
 					elsif (x = shipX1) and (y = std_logic_vector(to_unsigned(14,4))) then
-						if ship_sprite( 31-indY, 31-indX) = '1' then
+						if ship_sprite( indY, indX) = '1' then
 							rgb <= BLUE;
 						else
 							rgb <= BLACK;
 						end if;
 						
 					-- Show ship 2 in cyan
-					elsif player2enable = '1' and (x = shipX2) and (y = std_logic_vector(to_unsigned(14,4))) then
-						if ship_sprite( 31-indY, 31-indX) = '1' then
+					elsif  player2shown  = '1' and (x = shipX2) and (y = std_logic_vector(to_unsigned(14,4))) then
+						if ship_sprite( indY, indX) = '1' then
 							rgb <= CYAN;
 						else
 							rgb <= BLACK;
@@ -262,7 +262,7 @@ begin
 						
 					-- Show invaders in green	
 					elsif ( currentInvader /= "00") and (y = invLine) then
-						currentPixel := alien1( 31-indY, 31-indX);
+						currentPixel := alien1( indY, indX);
 						if currentPixel = '1' then
 							case currentInvader is 
 								when "01" => -- Easy alien
@@ -299,6 +299,16 @@ begin
 						rgb <= BLACK;
 					else
 						rgb <= BLUE; 
+					end if;
+					-- Temporarily blue checkerboard pattern
+					
+				when "011" =>
+					-- Game won screen
+					-------------------------------------
+					if (x(0) xor y(0)) = '1' then
+						rgb <= BLACK;
+					else
+						rgb <= YELLOW; 
 					end if;
 					-- Temporarily blue checkerboard pattern
 					

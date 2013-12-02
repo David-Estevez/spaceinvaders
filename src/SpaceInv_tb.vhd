@@ -13,21 +13,17 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
     -- Component Declaration for the Unit Under Test (UUT)
  
     COMPONENT SpaceInv
-    PORT(
-         clk : IN  std_logic;
-         reset : IN  std_logic;
-         Test : IN  std_logic;
-         Inicio : IN  std_logic;
-         Izquierda : IN  std_logic;
-         Derecha : IN  std_logic;
-			Disparo: IN std_logic;
-			LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
-         HSync : OUT  std_logic;
-         VSync : OUT  std_logic;
-         R : OUT  std_logic;
-         G : OUT  std_logic;
-         B : OUT  std_logic
-        );
+    PORT ( 
+			  clk : in  STD_LOGIC;
+           reset : in  STD_LOGIC;
+			  Test: in STD_LOGIC; 	 
+           left1, right1, start1, shoot1: in STD_LOGIC;
+           left2, right2, start2, shoot2: in STD_LOGIC;			  
+			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
+			  HSync : out  STD_LOGIC;
+           VSync : out  STD_LOGIC;
+           R,G,B : out  STD_LOGIC
+			);
     END COMPONENT;
     
 
@@ -35,11 +31,17 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
    signal clk : std_logic := '0';
    signal reset : std_logic := '0';
    signal Test : std_logic := '0';
-   signal Inicio : std_logic := '0';
-   signal Izquierda : std_logic := '0';
-   signal Derecha : std_logic := '0';
-	signal Disparo : std_logic := '0';
-
+   
+	signal start1 : std_logic := '0';
+   signal left1 : std_logic := '0';	
+   signal right1 : std_logic := '0';
+	signal shoot1 : std_logic := '0';
+   
+	signal start2 : std_logic := '0';
+   signal left2 : std_logic := '0';	
+   signal right2 : std_logic := '0';
+	signal shoot2 : std_logic := '0';
+	
  	--Outputs
 	signal LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: STD_LOGIC;
    signal HSync : std_logic;
@@ -59,10 +61,8 @@ BEGIN
           clk => clk,
           reset => reset,
           Test => Test,
-          Inicio => Inicio,
-          Izquierda => Izquierda,
-          Derecha => Derecha,
-			 Disparo => Disparo,
+          left1 => left1, right1 => right1, start1 => start1, shoot1 => shoot1,
+          left2 => left2, right2 => right2, start2 => start2, shoot2 => shoot2,
 			 LED0 => LED0, LED1 => LED1, LED2 => LED2, LED3 => LED3,
 			 LED4 => LED4, LED5 => LED5, LED6 => LED6, LED7 => LED7,
           HSync => HSync,
@@ -101,22 +101,22 @@ BEGIN
 		wait for frame_period;
 		
 		-- Start the game:
-		Inicio <= '1';
+		start1 <= '1';
 		wait for frame_period;
 		
 		-- Wait until aliens kill you (for this you have to setup aliens
 		-- on line 13 or otherwise you will likely die waiting for the simulation)
-		Inicio <= '0';
+		start1 <= '0';
 		
 		-- Shoot:
-		Disparo <= '1';
+		shoot1 <= '1';
 		wait for frame_period;
-		Disparo <= '0';
+		shoot1 <= '0';
 		
 		wait for 130ms;
 		
 		-- Go to the inicial state again:
-		Derecha <= '1';
+		right1 <= '1';
 		wait for 2*frame_period;
 		
 

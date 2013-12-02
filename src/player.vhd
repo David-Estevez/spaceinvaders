@@ -15,13 +15,21 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity player is
-    Port ( Right : in  STD_LOGIC;
+    Port ( 
+				-- User controls
+			  Right : in  STD_LOGIC;
            Left  : in  STD_LOGIC;
            Start : in  STD_LOGIC;
            Shoot : in  STD_LOGIC;
+			  
+			  -- Control signals
            clk   : in  STD_LOGIC;
            Reset : in  STD_LOGIC;
            Clear : in  STD_LOGIC;
+			  ScoreClear : in STD_LOGIC;
+			  Enable: in  STD_LOGIC;
+			  
+			  -- Internal signals
 			  hit	  : in  STD_LOGIC;
            posShip      : out  STD_LOGIC_VECTOR (4 downto 0);
            startPulse   : out  STD_LOGIC;
@@ -98,7 +106,7 @@ begin
 					clear => clear,
 					left => leftDetected,
 					right => rightDetected,
-					enable => '1',
+					enable => enable,
 					posH => posHBus 
 					);
 				
@@ -107,7 +115,7 @@ begin
 					clk => clk,
 					reset => Reset,
 					clear => clear,
-					enable => '1',
+					enable => enable,
 					input => Left,
 					detected => leftDetected
 					);
@@ -117,7 +125,7 @@ begin
 					clk => clk,
 					reset => Reset,
 					clear => clear,
-					enable =>  '1',
+					enable =>  enable,
 					input => Right,
 					detected => rightDetected
 					);
@@ -155,7 +163,7 @@ begin
 			
 		elsif clk'event and clk = '1' then
 			-- Erase score
-			if clear = '1' then
+			if ScoreClear = '1' then
 				intScore := 0;
 			
 			-- Increase score when alien is hit

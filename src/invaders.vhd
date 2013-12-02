@@ -31,7 +31,8 @@ entity invaders is
          bullY2 : in  std_logic_vector(3 downto 0);
          hit2   : out std_logic;
          invArray : inout std_logic_vector(39 downto 0);
-			invLine   : inout std_logic_vector(3 downto 0)
+			invLine   : inout std_logic_vector(3 downto 0);
+			level  : in  std_logic_vector( 2 downto 0 )
          ); 
 end invaders;   
 
@@ -40,8 +41,20 @@ architecture behavioral of invaders is
    signal right : std_logic := '0'; -- movement of invaders: 1 = right;
    signal tick  : std_logic; -- Signal from timer
 	signal moving : std_logic; 
+	signal sighit1, sighit2: std_logic;
+
 	
-	constant initArray : std_logic_vector(39 downto 0) := "0000000000000000000001010110111111100101";
+	type INVADERMATRIX is array( 0 to 7) of std_logic_vector( 39 downto 0);
+	constant initArray : INVADERMATRIX := ( 
+															"0000000000000000000001010101010101010101",  -- level 1
+															"0000000000000000000001010101101001010101",  -- level 2
+															"0000000000000000000001010110101010010101",  -- level 3
+															"0000000000000000000001011010101010100101",  -- level 4
+															"0000000000000000000010101010101010101010",  -- level 5
+															"0000000000000000000001011010111110100101",  -- level 6
+															"0000000000000000000001011011111111100101",  -- level 7
+															"0000000000000000000011111111111111111111"   -- level 8
+														);
 	--signal internalInvLine: std_logic_vector( 3 downto 0);
 
    component timer
@@ -65,24 +78,26 @@ begin
    process (reset, clk)
 		variable intBulletX1: integer; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
 		variable intBulletX2: integer; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
+		variable intLevel: integer; 	 -- Temporarily storage for level
 		variable currentInvader: std_logic_vector(1 downto 0);
    begin
       if reset = '1' then 
 			--Default values:
 			moving <= '0';
 			right <= '0';
-			hit1 <= '0';
-			hit2 <= '0';
+			sighit1 <= '0';
+			sighit2 <= '0';
 			
 			-- Choose this value for simulating 'you win' state:
          --invArray <=  "0000000000000000000000000000000000000000" ;
 			-- Otherwise, this is the correct value (for first level):
-			invArray <= initArray;
+			intLevel :=  to_integer( unsigned( level));
+			invArray <=  initArray( intLevel );
 			
 			-- Choose this value for simulating 'you lose' state:
-			-- invLine <= "1101";
+			invLine <= "1101";
 			-- Otherwise, this is the correct value:
-         invLine <= "0000"; 
+         --invLine <= "0000"; 
 			
 
       elsif clk'event and clk = '1' then
@@ -90,13 +105,14 @@ begin
 					--Default values:
 					moving <= '0';
 					right <= '0';
-					hit1 <= '0';
-					hit2 <= '0';
+					sighit1 <= '0';
+					sighit2 <= '0';
 			
 					-- Choose this value for simulating 'you win' state:
 					--invArray <=  "0000000000000000000000000000000000000000" ;
 					-- Otherwise, this is the correct value (for first level):
-					invArray <= initArray;
+					intLevel :=  to_integer( unsigned( level));
+					invArray <=  initArray( intLevel );
 			
 					-- Choose this value for simulating 'you lose' state:
 					-- invLine <= "1101";
@@ -144,8 +160,8 @@ begin
 				-- Checking for bullet 1
 				-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
 				intBulletX1 := to_integer(unsigned(bullX1))*2;
-				if (bullY1 = invLine) and invArray( intBulletX1 + 1 downto intBulletX1 ) /= "00" then
-					hit1 <= '1';
+				if (sighit1 = '0' ) and (bullY1 = invLine) and invArray( intBulletX1 + 1 downto intBulletX1 ) /= "00" then
+					sighit1 <= '1';
 					-- Substract 1 to the alien power7
 					currentInvader := invArray( intBulletX1+1 downto intBulletX1 ) ;
 					case currentInvader is
@@ -156,14 +172,14 @@ begin
 					end case;
 					--invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
 				else
-					hit1 <= '0';
+					sighit1 <= '0';
 				end if ;
 				
 				-- Checking for bullet2
 				-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
 				intBulletX2 := to_integer(unsigned(bullX2))*2;
-				if (bullY2 = invLine) and invArray( intBulletX2 + 1 downto intBulletX2 ) /= "00" then
-					hit2 <= '1';
+				if ( sighit2 = '0' ) and (bullY2 = invLine) and invArray( intBulletX2 + 1 downto intBulletX2 ) /= "00" then
+					sighit2 <= '1';
 					-- Substract 1 to the alien power
 					currentInvader := invArray( intBulletX2+1 downto intBulletX2 ) ;
 					case currentInvader is
@@ -174,12 +190,16 @@ begin
 					end case;
 					--invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
 				else
-					hit2 <= '0';
+					sighit2 <= '0';
 				end if ;
 				
    		end if;	
 		end if; 	
 			
+		-- Set hit outputs
+		hit1 <= sighit1;
+		hit2 <= sighit2;
+		
    end process;
 
 end behavioral;
