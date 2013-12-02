@@ -50,10 +50,15 @@ architecture Behavioral of SpaceInv is
 		test 	: in std_logic;
 		invArray: in std_logic_vector (39 downto 0);
 		invLine : in std_logic_vector (3 downto 0);
-		shipX	: in std_logic_vector (4 downto 0);
-		bullX 	: in std_logic_vector (4 downto 0);  
-		bullY 	: in std_logic_vector (3 downto 0);
-		bulletFlying: in std_logic;
+		shipX1	: in std_logic_vector (4 downto 0);
+		bullX1 	: in std_logic_vector (4 downto 0);  
+		bullY1 	: in std_logic_vector (3 downto 0);
+		bulletFlying1: in std_logic;
+		player2enable : in std_logic;
+		shipX2	: in std_logic_vector (4 downto 0);
+		bullX2 	: in std_logic_vector (4 downto 0);  
+		bullY2 	: in std_logic_vector (3 downto 0);
+		bulletFlying2: in std_logic;
 		specialScreen: in std_logic_vector( 2 downto 0);
 		rgb 	: out std_logic_vector(2 downto 0)
 );
@@ -66,9 +71,12 @@ architecture Behavioral of SpaceInv is
          reset : in  std_logic;
 			clear : in  std_logic;
 			start : in  std_logic;
-         bullX : in  std_logic_vector(4 downto 0);
-         bullY : in  std_logic_vector(3 downto 0);
-         hit   : out std_logic;
+         bullX1 : in  std_logic_vector(4 downto 0);
+         bullY1 : in  std_logic_vector(3 downto 0);
+         hit1   : out std_logic;
+			bullX2 : in  std_logic_vector(4 downto 0);
+         bullY2 : in  std_logic_vector(3 downto 0);
+         hit2   : out std_logic;
          invArray : inout std_logic_vector(39 downto 0);
 			invLine   : inout std_logic_vector(3 downto 0)
          ); 
@@ -97,11 +105,11 @@ architecture Behavioral of SpaceInv is
 	signal RGB: STD_LOGIC_VECTOR (2 downto 0);
 	signal X, Y: STD_LOGIC_VECTOR (9 downto 0);
 	signal specialScreen: STD_LOGIC_VECTOR( 2 downto 0);
-	signal hit: STD_LOGIC;
 	signal testEnable: STD_LOGIC;
 	
 	-- Clear lines:
-	signal playerClear: STD_LOGIC;
+	signal player1Clear: STD_LOGIC;
+	signal player2Clear: STD_LOGIC;
 	signal invadersClear: STD_LOGIC;
 	
 	-- Inputs to ScreenFormat
@@ -109,12 +117,30 @@ architecture Behavioral of SpaceInv is
 	signal invLine : std_logic_vector (3 downto 0);
 	
 	-- Player 1 signals:
-	signal startPulse: STD_LOGIC;
-	signal posH	: std_logic_vector (4 downto 0);
-	signal bullX 	: std_logic_vector (4 downto 0) := "11111";  
-	signal bullY 	: std_logic_vector (3 downto 0) := "1111";
-	signal bulletFlying  : std_logic;
-	signal Score:  STD_LOGIC_VECTOR (7 downto 0);
+	signal p1right: std_logic;
+	signal p1left: std_logic;
+	signal p1start: std_logic;
+	signal p1shoot: std_logic;
+	signal p1startPulse: std_logic;
+	signal p1posH	: std_logic_vector (4 downto 0);
+	signal p1hit : std_logic;
+	signal p1bullX 	: std_logic_vector (4 downto 0);  
+	signal p1bullY 	: std_logic_vector (3 downto 0);
+	signal p1bulletFlying  : std_logic;
+	signal p1Score:  std_logic_vector (7 downto 0);
+	
+	-- Player 2 signals
+	signal p2right: std_logic;
+	signal p2left: std_logic;
+	signal p2start: std_logic;
+	signal p2shoot: std_logic;
+	signal p2startPulse: std_logic;
+	signal p2posH	: std_logic_vector (4 downto 0);
+	signal p2hit : std_logic;
+	signal p2bullX 	: std_logic_vector (4 downto 0);  
+	signal p2bullY 	: std_logic_vector (3 downto 0);
+	signal p2bulletFlying  : std_logic;
+	signal p2Score:  std_logic_vector (7 downto 0);
 	
 	-- State machine things:
 	type State is ( testState, Start, Playing, YouWin, YouLose );
@@ -142,10 +168,15 @@ begin
 					test 				=> testEnable,
 					invArray 		=> invArray,
 					invLine 			=> invLine,
-					shipX	 			=> posH,
-					bullX 			=> bullX,
-					bullY 			=> bullY,
-					bulletFlying   => bulletFlying,
+					shipX1	 		=> p1posH,
+					bullX1 			=> p1bullX,
+					bullY1 			=> p1bullY,
+					bulletFlying1  => p1bulletFlying,
+					player2enable  => '1',
+					shipX2	 		=> p2posH,
+					bullX2 			=> p2bullX,
+					bullY2 			=> p2bullY,
+					bulletFlying2  => p2bulletFlying,
 					specialScreen  => specialScreen,
 					rgb 	 			=> rgb
 					);
@@ -156,31 +187,58 @@ begin
 					reset => Reset,
 					Clear => invadersClear,
 					start => inicio,
-					bullX => bullX,
-					bullY => bullY,
-					hit => hit,
+					bullX1 => p1bullX,
+					bullY1 => p1bullY,
+					hit1 => p1hit,
+					bullX2 => p2bullX,
+					bullY2 => p2bullY,
+					hit2 => p2hit,
 					invArray => invArray,
 					invLine => invLine
         			);	
 	
 	player1: player
 	   PORT MAP ( 
-			  Right => Derecha,
-           Left  => Izquierda,
-           Start => Inicio,
-           Shoot => Disparo,
+			  Right => p1right,
+           Left  => p1left,
+           Start => p1start,
+           Shoot => p1shoot,
            clk   => clk,
            Reset => reset,
-           Clear => playerClear,
-			  hit => hit,
-           posShip => posH,
-           startPulse => startPulse,
-           BulletX    => bullX,
-           BulletY    => bullY,
-           BulletActive => bulletFlying,
-           Score        => Score
+           Clear => player1Clear,
+			  hit => p1hit,
+           posShip => p1posH,
+           startPulse => p1startPulse,
+           BulletX    => p1bullX,
+           BulletY    => p1bullY,
+           BulletActive => p1bulletFlying,
+           Score        => p1Score
+			  );
+			  
+	player2: player
+	   PORT MAP ( 
+			  Right => p2right,
+           Left  => p2left,
+           Start => p2start,
+           Shoot => p2shoot,
+           clk   => clk,
+           Reset => reset,
+           Clear => player2Clear,
+			  hit => p2hit,
+           posShip => p2posH,
+           startPulse => p2startPulse,
+           BulletX    => p2bullX,
+           BulletY    => p2bullY,
+           BulletActive => p2bulletFlying,
+           Score        => p2Score
 			  );
    
+	-- Linking external I/O lines with players:
+	p1right <= Derecha;
+	p1left <= Izquierda;
+	p1start <= Inicio;
+	p1shoot <= Disparo;
+	
 	-- Process for changing states:
 	process( clk, reset)
 	begin
@@ -195,7 +253,7 @@ begin
 	
 	-- Process for modelling the transitions / outputs 
 	-- of the state machine
-	process( currentState, Test, Inicio, invArray, invLine, Izquierda, Derecha)
+	process( currentState, Test, invArray, invLine, p1right, p1left, p1start, p1shoot, p2right, p2left, p2start, p2shoot)
 	begin
 		nextState <= currentState;
 		
@@ -206,7 +264,8 @@ begin
 					testEnable <= '1';
 					specialScreen <= "000";
 					invadersClear <= '1';
-					playerClear <= '1';
+					player1Clear <= '1';
+					player2Clear <= '1';
 					
 					-- Next state:
 					if ( Test = '0' ) then
@@ -219,12 +278,13 @@ begin
 					testEnable <= '0';
 					specialScreen <= "000";
 					invadersClear <= '1';
-					playerClear <= '0';
+					player1Clear <= '0';
+					player2Clear <= '0';					
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( Inicio = '1' ) then
+					elsif ( p1start = '1' or p2start = '1') then
 						nextState <= Playing;
 					end if;
 				
@@ -234,7 +294,8 @@ begin
 					testEnable <= '0';
 					specialScreen <= "000";
 					invadersClear <= '0';
-					playerClear <= '0';
+					player1Clear <= '0';
+					player2Clear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -251,12 +312,13 @@ begin
 					testEnable <= '0';
 					specialScreen <= "001";
 					invadersClear <= '1';
-					playerClear <= '1';
+					player1Clear <= '1';
+					player2Clear <= '1';
 										
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
-					elsif ( Izquierda = '1' or Derecha = '1' ) then
+					elsif ( p1start = '1' or p2start = '1' ) then
 						nextState <= Start;
 					end if;
 					
@@ -266,26 +328,27 @@ begin
 					testEnable <= '0';
 					specialScreen <= "010";
 					invadersClear <= '1';
-					playerClear <= '1';
+					player1Clear <= '1';
+					player2Clear <= '1';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( Izquierda = '1' or Derecha = '1' ) then
+					elsif ( p1start = '1' or p2start = '1' ) then
 						nextState <= Start;
 					end if;
 			end case;
 		end process;
 		
 		-- Show score on the leds:
-		LED0 <= score(0);
-		LED1 <= score(1);
-		LED2 <= score(2);
-		LED3 <= score(3);
-		LED4 <= score(4);
-		LED5 <= score(5);
-		LED6 <= score(6);
-		LED7 <= score(7);
+		LED0 <= p1score(0);
+		LED1 <= p1score(1);
+		LED2 <= p1score(2);
+		LED3 <= p1score(3);
+		LED4 <= p1score(4);
+		LED5 <= p1score(5);
+		LED6 <= p1score(6);
+		LED7 <= p1score(7);
 		
 end Behavioral;
 

@@ -21,10 +21,15 @@ port (
 	test 	: in std_logic;
 	invArray: in std_logic_vector (39 downto 0);
 	invLine : in std_logic_vector (3 downto 0);
-	shipX	: in std_logic_vector (4 downto 0);
-	bullX 	: in std_logic_vector (4 downto 0);  
-	bullY 	: in std_logic_vector (3 downto 0);
-	bulletFlying: in std_logic;
+	shipX1	: in std_logic_vector (4 downto 0);
+	bullX1 	: in std_logic_vector (4 downto 0);  
+	bullY1 	: in std_logic_vector (3 downto 0);
+	bulletFlying1: in std_logic;
+	player2enable : in std_logic;
+	shipX2	: in std_logic_vector (4 downto 0);
+	bullX2 	: in std_logic_vector (4 downto 0);  
+	bullY2 	: in std_logic_vector (3 downto 0);
+	bulletFlying2: in std_logic;
 	specialScreen: in std_logic_vector( 2 downto 0);
 	rgb 	: out std_logic_vector(2 downto 0)
 );
@@ -223,18 +228,34 @@ begin
 					indInv := to_integer(unsigned(x)) * 2;
 					currentInvader := invArray( indInv+1 downto indInv);
 					
-					-- Show bullet in red
-					if bulletFlying = '1' and (x = bullX) and (y = bullY) then
+					-- Show player 1 bullet in red
+					if bulletFlying1 = '1' and (x = bullX1) and (y = bullY1) then
 						if funny_bullet( 31-indY, 31-indX) = '1' then
 							rgb <= RED;
 						else
 							rgb <= BLACK;
 						end if;
+					
+					-- Show player 2 bullet in magenta
+					elsif player2enable = '1' and bulletFlying2 = '1' and (x = bullX2) and (y = bullY2) then
+						if funny_bullet( 31-indY, 31-indX) = '1' then
+							rgb <= MAGENTA;
+						else
+							rgb <= BLACK;
+						end if;
 						
-					-- Show ship in blue		
-					elsif (x = shipX) and (y = std_logic_vector(to_unsigned(14,4))) then
+					-- Show ship 1 in blue		
+					elsif (x = shipX1) and (y = std_logic_vector(to_unsigned(14,4))) then
 						if ship_sprite( 31-indY, 31-indX) = '1' then
 							rgb <= BLUE;
+						else
+							rgb <= BLACK;
+						end if;
+						
+					-- Show ship 2 in cyan
+					elsif player2enable = '1' and (x = shipX1) and (y = std_logic_vector(to_unsigned(14,4))) then
+						if ship_sprite( 31-indY, 31-indX) = '1' then
+							rgb <= CYAN;
 						else
 							rgb <= BLACK;
 						end if;

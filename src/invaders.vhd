@@ -24,9 +24,12 @@ entity invaders is
          reset : in  std_logic;
 			clear : in  std_logic;
 			start : in  std_logic;
-         bullX : in  std_logic_vector(4 downto 0);
-         bullY : in  std_logic_vector(3 downto 0);
-         hit   : out std_logic;
+         bullX1 : in  std_logic_vector(4 downto 0);
+         bullY1 : in  std_logic_vector(3 downto 0);
+         hit1   : out std_logic;         
+			bullX2 : in  std_logic_vector(4 downto 0);
+         bullY2 : in  std_logic_vector(3 downto 0);
+         hit2   : out std_logic;
          invArray : inout std_logic_vector(39 downto 0);
 			invLine   : inout std_logic_vector(3 downto 0)
          ); 
@@ -60,13 +63,15 @@ begin
 
 	-- Main process
    process (reset, clk)
-		variable intBulletX: integer; -- Temporarily storage for bullet X position translated into 2-bit-per-alien coordinates
+		variable intBulletX1: integer; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
+		variable intBulletX2: integer; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
    begin
       if reset = '1' then 
 			--Default values:
 			moving <= '0';
 			right <= '0';
-			hit <= '0';
+			hit1 <= '0';
+			hit2 <= '0';
 			
 			-- Choose this value for simulating 'you win' state:
          --invArray <=  "0000000000000000000000000000000000000000" ;
@@ -84,7 +89,8 @@ begin
 					--Default values:
 					moving <= '0';
 					right <= '0';
-					hit <= '0';
+					hit1 <= '0';
+					hit2 <= '0';
 			
 					-- Choose this value for simulating 'you win' state:
 					--invArray <=  "0000000000000000000000000000000000000000" ;
@@ -134,16 +140,28 @@ begin
 					end if;
 				end if;
 			
-				-- Checking for bullet
+				-- Checking for bullet 1
 				-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
-				intBulletX := to_integer(unsigned(bullX))*2;
-				if (bullY = invLine) and invArray( intBulletX + 1 downto intBulletX ) /= "00" then
-					hit <= '1';
+				intBulletX1 := to_integer(unsigned(bullX1))*2;
+				if (bullY1 = invLine) and invArray( intBulletX1 + 1 downto intBulletX1 ) /= "00" then
+					hit1 <= '1';
 					-- Substract 1 to the alien power
-					invArray( intBulletX+1 downto intBulletX ) <= std_logic_vector(unsigned( invArray( intBulletX+1 downto intBulletX )) - 1 );
+					invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
 				else
-					hit <= '0';
+					hit1 <= '0';
 				end if ;
+				
+				-- Checking for bullet2
+				-- [ There is an alien if there is a '1' in either the position bullX*2 or bullX*2+1 ]
+				intBulletX2 := to_integer(unsigned(bullX2))*2;
+				if (bullY2 = invLine) and invArray( intBulletX2 + 1 downto intBulletX2 ) /= "00" then
+					hit2 <= '1';
+					-- Substract 1 to the alien power
+					invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
+				else
+					hit2 <= '0';
+				end if ;
+				
    		end if;	
 		end if; 	
 			
