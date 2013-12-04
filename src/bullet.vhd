@@ -10,6 +10,7 @@ entity bullet is
    port (clk      : in  std_logic;
          reset    : in  std_logic;
 			clear		: in  std_logic;
+			enable	: in 	std_logic;
          hit      : in  std_logic;  -- '1' when an invader has been hit
          shoot    : in  std_logic;  -- pushbutton
          posH     : in  std_logic_vector(4 downto 0);   -- h position of ship
@@ -60,7 +61,7 @@ begin
 				intbullX <= std_logic_vector(to_unsigned(0,5));
 				intbullY <= std_logic_vector(to_unsigned(14,4));
 				intflying := '0';
-			else
+			elsif enable = '1' then
 				-- Shoot the bullet
 				if ((intflying = '0') and (shoot = '1')) then
 					intflying := '1';  -- bullet moving

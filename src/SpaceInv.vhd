@@ -296,7 +296,7 @@ begin
 	
 	-- Process for modelling the transitions / outputs 
 	-- of the state machine
-	process( currentState, Test, invArray, invLine, p1right, p1left, p1start, p1shoot, p2right, p2left, p2start, p2shoot)
+	process( currentState, Test, invArray, invLine, p1startPulse, p2startPulse, level)
 	begin
 		nextState <= currentState;
 		
@@ -313,14 +313,10 @@ begin
 					invadersStart <= '0';
 					-- Player signals
 					p1Enable <= '0';
-					p2Enable <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
-					p1ScoreClear <= '1';
-					p2ScoreClear <= '1';
 					-- Level control
 					levelUp <= '0';
-					levelClear <= '1';
 					
 					-- Next state:
 					if ( Test = '0' ) then
@@ -343,20 +339,14 @@ begin
 					p1Enable <= '0';
 					player1Clear <= '1';
 					player2Clear <= '1';
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
 					-- Level control
 					levelUp <= '0';
-					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( p1start = '1' ) then 
+					elsif ( p1startPulse = '1' ) then 
 						nextState <= Playing;
-					elsif ( p2start = '1' ) then
-						p2Enable <= '1';
-						nextState <= Start;
 					else
 						nextState <= currentState;
 					end if;
@@ -375,11 +365,9 @@ begin
 					p1Enable <= '1';
 					player1Clear <= '0';
 					player2Clear <= '0';
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
 					-- Level control
 					levelUp <= '0';
-					levelClear <= '0';
+
 					
 					-- Next state:
 					if ( Test = '1' ) then 
@@ -406,18 +394,15 @@ begin
 					p1Enable <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
 					-- Level control
 					levelUp <= '1';
-					levelClear <= '0';
-										
+
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
-					elsif ( (p1start = '1') or (p2start = '1')) and (level = "111" ) then
+					elsif ( (p1startPulse = '1') or (p2startPulse = '1')) and (level = "111" ) then
 						nextState <= WinGame;
-					elsif ( p1start = '1' or p2start = '1' ) then
+					elsif ( p1startPulse = '1') or (p2startPulse = '1') then
 						nextState <= Start;
 					else
 						nextState <= currentState;
@@ -438,22 +423,13 @@ begin
 					p2Enable <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
 					-- Level control
 					levelUp <= '0';
-					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( p1start = '1' or p2start = '1' ) then
-						-- Reset scores and level
-						p1ScoreClear <= '1';
-						p2ScoreClear <= '1';
-						levelClear <= '1';
-						p2Enable <= '0';
-						
+					elsif ( p1startPulse = '1') or (p2startPulse = '1') then
 						nextState <= Start;
 					else
 						nextState <= currentState;
@@ -474,34 +450,53 @@ begin
 					p2Enable <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
 					-- Level control
 					levelUp <= '0';
-					levelClear <= '0';
 					
 					-- Next state:
 					if ( Test = '1' ) then
 						nextState <= testState;
-					elsif ( p1start = '1' or p2start = '1' ) then
-						-- Reset scores and level
-						p1ScoreClear <= '1';
-						p2ScoreClear <= '1';
-						levelClear <= '1';
-						p2Enable <= '0';
-						
+					elsif ( p1startPulse = '1') or (p2startPulse = '1') then
 						nextState <= Start;
 					else
 						nextState <= currentState;
-					end if;
-					
-				when others =>					
-					-- Next state:
-					nextState <= Start;
-					
+					end if;				
 			end case;
 		end process;
 		
+		-- Score and level clear control:
+		process( nextState )
+		begin
+			if nextState = Start and currentState /= YouWin then
+					p1ScoreClear <= '1';
+					p2ScoreClear <= '1';
+					levelClear <= '1';
+			else
+					p1ScoreClear <= '0';
+					p2ScoreClear <= '0';
+					levelClear <= '0';
+			end if;
+		end process;
+		
+		-- Latch for the player 2 enable signal
+		process( clk, Reset)
+		begin
+			if Reset = '1' then
+				p2Enable <= '0';
+			elsif clk'event and clk = '1' then
+				-- Player 2 enable:
+				-------------------------------------------------------------------------------------------------------
+				-- Enable player 2 if p2start is pressed on start screen
+				if ( currentState = Start ) and (p2startPulse = '1') then
+						p2Enable <= '1';
+						
+				-- Disable player 2 when game is lost
+				elsif ( currentState = YouLose or  currentState = WinGame ) and (p1startPulse = '1' or p2startPulse = '1') then
+						p2Enable <= '0';
+				end if;
+			end if;
+		end process;
+
 		-- Process controlling the level
 		process( clk, Reset)
 			variable intLevel : integer range 0 to 7;

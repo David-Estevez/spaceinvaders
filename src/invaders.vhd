@@ -76,9 +76,9 @@ begin
 
 	-- Main process
    process (reset, clk)
-		variable intBulletX1: integer; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
-		variable intBulletX2: integer; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
-		variable intLevel: integer; 	 -- Temporarily storage for level
+		variable intBulletX1: integer range 0 to 39; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
+		variable intBulletX2: integer range 0 to 39; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
+		variable intLevel: integer range 0 to 7; 	 -- Temporarily storage for level
 		variable currentInvader: std_logic_vector(1 downto 0);
    begin
       if reset = '1' then 
@@ -162,15 +162,15 @@ begin
 				intBulletX1 := to_integer(unsigned(bullX1))*2;
 				if (sighit1 = '0' ) and (bullY1 = invLine) and invArray( intBulletX1 + 1 downto intBulletX1 ) /= "00" then
 					sighit1 <= '1';
-					-- Substract 1 to the alien power7
-					currentInvader := invArray( intBulletX1+1 downto intBulletX1 ) ;
-					case currentInvader is
-						when "01" => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
-						when "10" => invArray( intBulletX1+1 downto intBulletX1 ) <= "01";
-						when "11" => invArray( intBulletX1+1 downto intBulletX1 ) <= "10";
-						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
-					end case;
-					--invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
+					-- Substract 1 to the alien power
+--					currentInvader := invArray( intBulletX1+1 downto intBulletX1 ) ;
+--					case currentInvader is
+--						when "01" => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+--						when "10" => invArray( intBulletX1+1 downto intBulletX1 ) <= "01";
+--						when "11" => invArray( intBulletX1+1 downto intBulletX1 ) <= "10";
+--						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+--					end case;
+					invArray( intBulletX1+1 downto intBulletX1 ) <= std_logic_vector(unsigned( invArray( intBulletX1+1 downto intBulletX1 )) - 1 );
 				else
 					sighit1 <= '0';
 				end if ;
@@ -181,14 +181,14 @@ begin
 				if ( sighit2 = '0' ) and (bullY2 = invLine) and invArray( intBulletX2 + 1 downto intBulletX2 ) /= "00" then
 					sighit2 <= '1';
 					-- Substract 1 to the alien power
-					currentInvader := invArray( intBulletX2+1 downto intBulletX2 ) ;
-					case currentInvader is
-						when "01" => invArray( intBulletX2+1 downto intBulletX2 ) <= "00";
-						when "10" => invArray( intBulletX2+1 downto intBulletX2 ) <= "01";
-						when "11" => invArray( intBulletX2+1 downto intBulletX2 ) <= "10";
-						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
-					end case;
-					--invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
+--					currentInvader := invArray( intBulletX2+1 downto intBulletX2 ) ;
+--					case currentInvader is
+--						when "01" => invArray( intBulletX2+1 downto intBulletX2 ) <= "00";
+--						when "10" => invArray( intBulletX2+1 downto intBulletX2 ) <= "01";
+--						when "11" => invArray( intBulletX2+1 downto intBulletX2 ) <= "10";
+--						when others => invArray( intBulletX1+1 downto intBulletX1 ) <= "00";
+--					end case;
+					invArray( intBulletX2+1 downto intBulletX2 ) <= std_logic_vector(unsigned( invArray( intBulletX2+1 downto intBulletX2 )) - 1 );
 				else
 					sighit2 <= '0';
 				end if ;

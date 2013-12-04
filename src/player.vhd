@@ -84,6 +84,7 @@ architecture Structural of player is
 			clk      : in  std_logic;
          reset    : in  std_logic;
 			clear		: in  std_logic;
+			enable	: in 	std_logic;
          hit      : in  std_logic;
          shoot    : in  std_logic;
          posH     : in  std_logic_vector(4 downto 0);
@@ -145,6 +146,7 @@ begin
 				clk 		=> clk,
 				reset 	=> Reset,
 				clear		=> clear,
+				enable   => enable,
 				hit   	=> hit,
 				shoot 	=>	Shoot, 
 				posH    	=> posHBus,
