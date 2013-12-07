@@ -20,26 +20,27 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity invaders is
-   port (clk   : in  std_logic;
+   port (
+		 clk   : in  std_logic;
          reset : in  std_logic;
-			clear : in  std_logic;
-			start : in  std_logic;
+		 clear : in  std_logic;
+		 start : in  std_logic;
          bullX1 : in  std_logic_vector(4 downto 0);
          bullY1 : in  std_logic_vector(3 downto 0);
          hit1   : out std_logic;         
-			bullX2 : in  std_logic_vector(4 downto 0);
+		 bullX2 : in  std_logic_vector(4 downto 0);
          bullY2 : in  std_logic_vector(3 downto 0);
          hit2   : out std_logic;
          invArray : inout std_logic_vector(39 downto 0);
-			invLine   : inout std_logic_vector(3 downto 0);
-			level  : in  std_logic_vector( 2 downto 0 )
+		 invLine   : inout std_logic_vector(3 downto 0);
+		 level  : in  std_logic_vector( 2 downto 0 )
          ); 
 end invaders;   
 
 
 architecture behavioral of invaders is
    signal right : std_logic := '0'; -- movement of invaders: 1 = right;
-   signal tick  : std_logic; -- Signal from timer
+   signal tick, tick1, tick2  : std_logic; -- Signal from timer
 	signal moving : std_logic; 
 	signal sighit1, sighit2: std_logic;
 
@@ -68,12 +69,23 @@ architecture behavioral of invaders is
       );
    end component;
 
+   signal enableTim1, enableTim2: std_logic;
+   
 begin
 	-- Instantiate a timer for invaders movement timing
-   speedTimer: timer
-      generic  map (200) -- Set this to a value around 10 for a faster simulation
-      port map ( clk => clk, reset => reset, clear => clear, en => '1', q => tick );
+   speedTimer1: timer
+      generic  map (400) -- Set this to a value around 10 for a faster simulation
+      port map ( clk => clk, reset => reset, clear => clear, en => enableTim1, q => tick1 );
 
+   speedTimer2: timer
+      generic  map (200) -- Set this to a value around 10 for a faster simulation
+      port map ( clk => clk, reset => reset, clear => clear, en => enableTim2, q => tick2 );
+   
+   -- Timers control
+   tick <= tick1 or tick2;
+   enableTim1 <= '1' when level(2) = '0' else '0';
+   enableTim2 <= not enableTim1;
+      
 	-- Main process
    process (reset, clk)
 		variable intBulletX1: integer range 0 to 39; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
