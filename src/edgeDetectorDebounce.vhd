@@ -18,6 +18,7 @@ entity edgeDetectorDebounce is
 	generic( debounceTime: integer := 100 );
 	port( clk: in STD_LOGIC;
 		  reset: in STD_LOGIC;
+		  clear : in STD_LOGIC;
 		  enable: in STD_LOGIC;
 		  input: in STD_LOGIC;
 		  detected: out STD_LOGIC );
@@ -41,6 +42,7 @@ architecture Behavioral of edgeDetectorDebounce is
 		generic  (  t: integer);
 		port (clk   : in  std_logic;
 				reset : in  std_logic;
+				clear : in  std_logic;
 				en    : in  std_logic;
 				q     : out std_logic);
 	end component;   
@@ -50,6 +52,7 @@ begin
 	tim0 : timer generic map ( t => debounceTime ) 
 					 port map ( clk => clk, 
 									reset => reset, 
+									clear => clear,
 									en => counterEnabled, 
 									q => timeout );
 	
@@ -61,7 +64,9 @@ begin
 			currentState <= notDetected;
 		-- Update State
 		elsif clk'Event and clk = '1' then
-			if enable = '1' then
+			if clear = '1' then
+					currentState <= notDetected;
+			elsif enable = '1' then
 					currentState <= nextState;				
 			end if;
 		end if;
