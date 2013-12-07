@@ -420,7 +420,6 @@ begin
 					invadersStart <= '0';
 					-- Player signals
 					p1Enable <= '0';
-					p2Enable <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';
 					-- Level control
@@ -447,7 +446,6 @@ begin
 					invadersStart <= '0';
 					-- Player signals
 					p1Enable <= '0';
-					p2Enable <= '0';
 					player1Clear <= '0';
 					player2Clear <= '0';
 					-- Level control
