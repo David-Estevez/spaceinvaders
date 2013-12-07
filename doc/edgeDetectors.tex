@@ -5,14 +5,14 @@ Para la interfase del diseño con los pulsadores diseñamos dos detectores de fl
 
 En el diseño final sólo hemos añadido el detector de flancos con antirrebote, debido a su mejor respuesta ante la entrada oscilante de los pulsadores reales.
 
-\subsection{Detector de flancos estándar}
+\subsubsection{Detector de flancos estándar}
 \label{edgeDetectorStd}
-El detector de flanco estándar es un circuito muy simple. Se tienen dos biestables, uno almacenando el estado actual de la señal de entrada, y el otro almacenando el estado de la señal en el tiempo t-1.
+El detector de flancos estándar es un circuito muy simple. Se tienen dos biestables, uno almacenando el estado actual de la señal de entrada, y el otro almacenando el estado de la señal en el tiempo t-1.
 
 Estas dos señales se comparan, y si hay un nivel alto en el estado actual, pero no en el anterior, entonces ha llegado un flanco, y el detector emite un pulso a la salida.
 
 
-\subsection{Detector de flancos con antirrebote}
+\subsubsection{Detector de flancos con antirrebote}
 \label{edgeDetectorDebounce}
 
 \begin{figure}[H]

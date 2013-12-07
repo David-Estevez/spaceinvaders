@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[parskip=full]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -14,7 +14,7 @@
 %\usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
 
-%\addtolength{\parskip}{\baselineskip}
+
 
 % Initial pararagraph blankspace
 \makeatletter 
@@ -24,6 +24,9 @@
 
 % Makes figures stay in place:
 \usepackage{float}
+
+\usepackage{parskip}
+\setlength{\parindent}{15pt}
 
 \begin{document}
 
@@ -64,6 +67,10 @@ Anna Vaskova
 \tableofcontents
 \newpage
 
+% Adds a newline after each paragraph
+%\addtolength{\parskip}{\baselineskip}
+%\setlength{\parskip}{0.3cm plus4mm minus3mm}
+
 \section{Introducción}
 %
 \section{Funcionamiento general}
@@ -71,6 +78,7 @@ Anna Vaskova
 \section{Explicación de los bloques}
 %
 \input{edgeDetectors}
+\input{player}
 \section{Conclusión / Posibles mejoras}
 %
 \end{document}
