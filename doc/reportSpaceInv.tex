@@ -8,6 +8,20 @@
 \chead{}
 \rhead{Implementación de Space Invaders en FPGA}
 \pagestyle{fancy}
+
+% Spanish support:
+\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+%\addtolength{\parskip}{\baselineskip}
+
+% Initial pararagraph blankspace
+\makeatletter 
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\z@}{-3.25ex \@plus 
+-1ex \@minus -.2ex}{1.5ex \@plus .2ex}{\normalfont\normalsize\bfseries}} 
+\makeatother
+
 \begin{document}
 
 %%%% FRONTPAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,6 +67,7 @@ Anna Vaskova
 %
 \section{Explicación de los bloques}
 %
+\input{edgeDetectors}
 \section{Conclusión / Posibles mejoras}
 %
 \end{document}
