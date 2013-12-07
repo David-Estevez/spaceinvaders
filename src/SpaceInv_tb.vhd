@@ -22,7 +22,8 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
 			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
 			  HSync : out  STD_LOGIC;
            VSync : out  STD_LOGIC;
-           R,G,B : out  STD_LOGIC
+           R,G,B : out  STD_LOGIC;
+           speaker : out std_logic
 			);
     END COMPONENT;
     
@@ -41,6 +42,7 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
    signal left2 : std_logic := '0';	
    signal right2 : std_logic := '0';
 	signal shoot2 : std_logic := '0';
+    
 	
  	--Outputs
 	signal LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: STD_LOGIC;
@@ -49,7 +51,7 @@ ARCHITECTURE behavior OF SpaceInv_tb IS
    signal R : std_logic;
    signal G : std_logic;
    signal B : std_logic;
-
+   signal speaker : std_logic;
    -- Clock period definitions
    constant clk_period : time := 20 ns;
 	constant frame_period: time := 16672 us;
@@ -69,7 +71,8 @@ BEGIN
           VSync => VSync,
           R => R,
           G => G,
-          B => B
+          B => B,
+          speaker => speaker
         );
 
    -- Clock process definitions
