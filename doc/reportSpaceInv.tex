@@ -1,14 +1,22 @@
 \documentclass{article}
+\usepackage[usenames,dvips]{color}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[top=1.55cm, bottom=2.29cm, left=1.6cm, right=1.47cm]{geometry}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+%  urlcolor     = \color{MidnightBlue}, %Colour for external hyperlinks
+%  linkcolor    = \color{MidnightBlue}, %Colour of internal links
+%  citecolor   = \color{MidnightBlue} %Colour of citations
+}
+
 \lhead{}
 \chead{}
 \rhead{Implementación de Space Invaders en FPGA}
 \pagestyle{fancy}
-
 % Spanish support:
 \usepackage[utf8]{inputenc}
 %\usepackage[T1]{fontenc}
@@ -77,6 +85,8 @@ Anna Vaskova
 %
 \section{Explicación de los bloques}
 %
+\input{vga}
+\input{formatoVGA}
 \input{edgeDetectors}
 \input{player}
 \input{invaders}
