@@ -20,7 +20,8 @@ entity SpaceInv is
 			  LED0, LED1, LED2, LED3, LED4, LED5, LED6, LED7: out STD_LOGIC;
 			  HSync : out  STD_LOGIC;
            VSync : out  STD_LOGIC;
-           R,G,B : out  STD_LOGIC
+           R,G,B : out  STD_LOGIC;
+           speaker : out STD_LOGIC
 );
 end SpaceInv;
 
@@ -109,6 +110,20 @@ architecture Behavioral of SpaceInv is
            Score        : out  STD_LOGIC_VECTOR (7 downto 0)
 		  );
 	end component;
+
+	component toneGenerator is
+   	port (clk  		    : in  std_logic;
+        reset 		    : in  std_logic;
+		p1_posShip 	    : in  std_logic;
+        p2_posShip      : in  std_logic;
+        p1_BulletActive	: in  std_logic;
+        p2_BulletActive	: in  std_logic;
+        inv_Hit1        : in  std_logic;
+        inv_Hit2        : in  std_logic;
+        specialScreen   : in  std_logic_vector( 2 downto 0);
+        toneOutput      : out std_logic
+        );
+    end component;
 	
 	
 	-- Clear lines:
@@ -271,6 +286,20 @@ begin
            Score        => p2Score
 			  );
    
+	soundCard: toneGenerator
+   	port map (
+   		clk  		    => clk,
+        reset 		    => reset,
+		p1_posShip 	    => p1posH(0),
+        p2_posShip      => p2posH(0),
+        p1_BulletActive	=> p1bulletFlying,
+        p2_BulletActive	=> p2bulletFlying,
+        inv_Hit1        => p1hit,
+        inv_Hit2        => p2hit,
+        specialScreen   => specialScreen,
+        toneOutput      => speaker
+        );
+
 	-- Linking external I/O lines with players:
 	p1right <= right1;
 	p1left <= left1;

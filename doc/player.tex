@@ -17,3 +17,5 @@ También posee una serie de señales de control del bloque: Reset asíncrono, Cl
 
 La implementación en VHDL simplemente instancia los bloques necesarios y realiza las conexiones entre ellos. El contador de la puntación, sin embargo, se ha implementado como un proceso, que incrementa una unidad el contador cada vez que le llega una señal de marciano alcanzado por un disparo (hit).
 
+\paragraph{Banco de pruebas}
+Para probar este bloque no se dispuso un banco de pruebas específico, sino que se comprobó su funcionalidad dentro del sistema ``SpaceInv'', al haber probado ya gran parte de los bloques internos de forma independiente. Por tanto, las pruebas de este bloque se limitaron a comprobar que al agrupar todos los bloques individuales se conservaba su funcionalidad intacta.

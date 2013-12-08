@@ -20,3 +20,8 @@ El control del flujo del juego y el funcionamiento de los distintos bloques se l
 
 Además de las señales que se controlan de forma combinacional dentro de la máquina de estados, se han añadido algunas señales dependientes del estado o de la transición, cuya lógica de activación es ligeramente más compleja, en procesos independientes. 
 Más concretamente, se ha añadido un biestable que contiene la señal de activación del jugador 2, que se acciona cuando nos encontramos en la pantalla de inicio de nivel (``Start'') y recibimos una señal de inicio del jugador 2 (``p2StartPulse), y se reinicia al perder la partida o ganar el juego (una vez el jugador 2 se une a la partida, permanece habilitado hasta que la partida acaba). También se ha añadido un proceso que reinicia las puntuaciones y el nivel cuando se produce una transición desde un estado que no sea ``Ganaste (YouWin)'' hasta el estado ``Inicial (Start)''.
+
+\paragraph{Banco de pruebas}
+Al estar la máquina de estados dentro de la entidad ``SpaceInv'' no se diseñó un banco de pruebas específico para ella, sino que se probó con todo el sistema. Para agilizar la simulación se modificaron todos los temporizadores a unos valores mucho más bajos que en condiciones de juego reales, de forma que se apreciase el funcionamiento en un tiempo más breve. 
+
+Para probar los estados de ``ganaste'' y ``perdiste'', debido a la imposibilidad de codificar una partida entera en el banco de pruebas, se modificaron las posiciones y estado de los invasores, de forma que al poner el vector ``ìnvArray'' a 0 se pudo comprobar el estado ``ganaste'' y colocando inicialmente los marcianos en la línea 14 sólo hubo que esperar 20 movimientos de los mismos para que los marcianos llegasen a la línea 15 y perdiese el juego.
