@@ -11,6 +11,8 @@ El detector de flancos estándar es un circuito muy simple. Se tienen dos biesta
 
 Estas dos señales se comparan, y si hay un nivel alto en el estado actual, pero no en el anterior, entonces ha llegado un flanco, y el detector emite un pulso a la salida.
 
+\paragraph{Banco de pruebas}
+En el banco de pruebas de este bloque se simuló una entrada de una duración superior a 1 periodo de reloj, con la señal de habilitación (``Enable'') activada y desactivada, de forma que se comprobó que la salida al llegar un flanco con el enable activado era de un pulso exacto.
 
 \subsubsection{Detector de flancos con antirrebote (edgeDetectorDebounce)}
 \label{edgeDetectorDebounce}
@@ -25,3 +27,6 @@ El detector de flancos con antirrebote es un detector de flancos estándar al qu
 
 Su diseño está basado en una máquina de estados simple (figura \ref{fig:edgeDetectorDebounceFSM}) que consta de cuatro estados: ``no detectado'', ``flanco detectado'', ``desactivado'' y ``esperando''. La máquina empieza en el estado ``no detectado'', y permanece en él mientras la entrada valga 0. Cuando recibe un 1, pasa al estado ``flanco detectado'', y la salida se pone a 1 hasta el siguiente flanco de reloj, en el cual pasa al estado
 ``desactivado'', poniendo la salida a 0. Mientras la máquina se encuentra en este estado, un temporizador cuenta el tiempo transcurrido, y bloquea el paso al estado siguiente. Cuando el tiempo deseado, en nuestro caso 100 ms,  ha transcurrido, la máquina de estados pasará al estado ``no detectado'' si la entrada es 0 o a ``esperando' si es 1. La máquina pasará entonces al estado de ``no detectado'' cuando reciba un 0 lógico.
+
+\paragraph{Banco de pruebas}
+Para probar este bloque se diseñó un banco de pruebas que simulaba una entrada ruidosa, con varias oscilaciones entre nivel alto y bajo, de forma que se comprobase que el detector sólo se activaba una vez tras el flanco, con una duración de un periodo de reloj.
