@@ -287,20 +287,28 @@ begin
 				when "001" =>
 					-- You win screen
 					-------------------------------------
+					-- Get coordinates inside de 32x32 macropixel
+					indX := to_integer(unsigned(VGAx(4 downto 0)));
+					indY := to_integer(unsigned(VGAy(4 downto 0)));
+					
+					-- Convert the 'macropixel' x coordinate to the invArray coordinates (2*x+1, 2*x)
+					indInv := to_integer(unsigned(x)) * 2;
+					currentInvader := invArray( indInv+1 downto indInv);
+					
 					if (y = std_logic_vector(to_unsigned(5,4))) then
 						-- We are in the correct line
-						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(8,5)))) then
+						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(9,5)))) then
 							-- We are in the correct box
-							if (p1Score(to_integer(unsigned(x))) = '1') then
+							if (p1Score(7-to_integer(unsigned(x))) = '1') then
 								-- Show an alien
 								currentPixel := alien1( indY, indX);
 								if currentPixel = '1' then
-									rgb <= BLUE;
-								else
 									rgb <= BLACK;
+								else
+									rgb <= BLUE;
 								end if;
 							else
-								rgb <= BLACK;
+									rgb <= BLUE;
 							end if;
 						else
 							rgb <= BLACK;
@@ -308,31 +316,27 @@ begin
 
 					elsif (y = std_logic_vector(to_unsigned(7,4))) then
 						-- We are in the correct line
-						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(8,5)))) then
+						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(9,5)))) then
 							-- We are in the correct box
-							if (p2Score(to_integer(unsigned(x))) = '1') then
+							if (p2Score(7-to_integer(unsigned(x))) = '1') then
 								-- Show an alien
 								currentPixel := alien1( indY, indX);
 								if currentPixel = '1' then
-									rgb <= RED;
-								else
 									rgb <= BLACK;
+								else
+									rgb <= RED;
 								end if;
 							else
-								rgb <= BLACK;
+									rgb <= RED;
 							end if;
 						else
 							rgb <= BLACK;
 						end if;	
+					else
+							rgb <= BLACK;
 					end if;	
 
-					
-					if (x(0) xor y(0)) = '1' then
-						rgb <= BLACK;
-					else
-						rgb <= RED; 
-					end if;
-					 -- Temporarily red checkerboard pattern
+				
 					
 				when "010" =>
 					-- You lose screen
