@@ -220,7 +220,7 @@ begin
 					bullX1 			=> p1bullX,
 					bullY1 			=> p1bullY,
 					bulletFlying1  => p1bulletFlying,
-					player2shown   => '1',
+					player2shown   => p2Enable,
 					shipX2	 		=> p2posH,
 					bullX2 			=> p2bullX,
 					bullY2 			=> p2bullY,
@@ -429,7 +429,7 @@ begin
 					-- Next state:
 					if ( Test = '1' ) then 
 						nextState <= testState;
-					elsif ( (p1startPulse = '1') or (p2startPulse = '1')) and (level = "111" ) then
+					elsif ( (p1startPulse = '1') or (p2startPulse = '1')) and (level = "000" ) then
 						nextState <= WinGame;
 					elsif ( p1startPulse = '1') or (p2startPulse = '1') then
 						nextState <= Start;
@@ -492,16 +492,18 @@ begin
 		end process;
 		
 		-- Score and level clear control:
-		process( nextState )
+		process( clk )
 		begin
-			if nextState = Start and currentState /= YouWin then
-					p1ScoreClear <= '1';
-					p2ScoreClear <= '1';
-					levelClear <= '1';
-			else
-					p1ScoreClear <= '0';
-					p2ScoreClear <= '0';
-					levelClear <= '0';
+			if clk'event and clk = '1' then
+				if ((nextState = Start) and ( currentState = YouLose or currentState = WinGame)) or currentState = testState then
+						p1ScoreClear <= '1';
+						p2ScoreClear <= '1';
+						levelClear <= '1';
+				else
+						p1ScoreClear <= '0';
+						p2ScoreClear <= '0';
+						levelClear <= '0';
+				end if;
 			end if;
 		end process;
 		
@@ -540,8 +542,12 @@ begin
 				if levelClear = '1' then
 					intLevel := 0;
 				-- Up counter
-				elsif levelUp = '1' and previousLevelUp = '0' and intLevel /= 7 then
-					intLevel := intLevel + 1;
+				elsif levelUp = '1' and previousLevelUp = '0' then
+					if intLevel = 7 then
+						intlevel := 0;
+					else
+						intLevel := intLevel + 1;
+					end if;
 				end if;
 				
 				-- Store the last value
@@ -554,14 +560,14 @@ begin
 			
 
 		-- Show score on the leds:
-		LED0 <= p1score(0);
-		LED1 <= p1score(1);
-		LED2 <= p1score(2);
-		LED3 <= p1score(3);
-		LED4 <= p1score(4);
-		LED5 <= p1score(5);
-		LED6 <= p1score(6);
-		LED7 <= p1score(7);
+		LED0 <= '1' when level = "000" else '0';
+		LED1 <= '1' when level = "001" else '0';
+		LED2 <= '1' when level = "010" else '0';
+		LED3 <= '1' when level = "011" else '0';
+		LED4 <= '1' when level = "100" else '0';
+		LED5 <= '1' when level = "101" else '0';
+		LED6 <= '1' when level = "110" else '0';
+		LED7 <= '1' when level = "111" else '0';
 		
 end Behavioral;
 
