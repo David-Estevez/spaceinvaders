@@ -1,5 +1,6 @@
 ----------------------------------------------------------------------------------
 -- GENERIC TIMER
+-- David Estévez Fernández
 -- Sergio Vilches
 -- Gives a pulse of one clock cycle width with a period of t (in milliseconds)
 ----------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ architecture behavioral of timer is
 	constant max : integer := (t*clkFreq)-1;
 	signal count : integer range 0 to max;
 begin
-   process (reset, clk)	   
+   process (reset, clk, count)	   
    begin
       if reset = '1' then 
          count <= 0;

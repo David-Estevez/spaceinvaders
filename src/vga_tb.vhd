@@ -6,6 +6,7 @@
 -- Testing of the vga controller entity
 --
 -- Author: David Estévez Fernández
+-- David Estévez Fernández
 ----------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;

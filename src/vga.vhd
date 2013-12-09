@@ -3,6 +3,7 @@
 -- Lab session #1: vga controller
 --
 -- Author: David Estévez Fernández
+-- David Estévez Fernández
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;

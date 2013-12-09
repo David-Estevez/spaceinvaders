@@ -1,7 +1,8 @@
 ----------------------------------------------------------------------------------
 -- TONE GENERATOR
 -- Sergio Vilches
--- Outputs an audio sweep tone
+-- David Estevez
+-- Outputs audio sweep tones
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -49,6 +50,8 @@ architecture behavioral of toneGenerator is
     signal fsm_win_detected         : std_logic;
     signal fsm_loose_detected       : std_logic;
 	
+    -- The following logic decodes which sound is needed for each situation, analyzing signals already present in spaceInv
+
     component edgeDetector is
     port( 
         clk: in STD_LOGIC;
@@ -164,7 +167,7 @@ begin
         end case;
     end process;
 
-	-- Sound selection
+	-- Sound selection. Selects the boundaries of the frequency sweep
    process (reset, clk) 
    begin
 		if reset = '1' then 
@@ -201,8 +204,8 @@ begin
 	end process;
 	
 	
-    -- Tone generation
-    process (reset, clk) 
+    -- Tone generation. Just a simple variable square wave generator
+    process (reset, clk, q) 
     begin
     if reset = '1' then 
         count <= 0;
@@ -223,7 +226,7 @@ begin
     end process;
 
 
-   -- Sweep
+   -- Sweep. Creates a ramp of frequencies
 process (reset, clk) 
    begin
       if reset = '1' then 

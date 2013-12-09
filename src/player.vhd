@@ -157,7 +157,7 @@ begin
 				
 	posShip <= posHBus;
 	
-	process( clk )
+	process( clk, reset )
 		variable intScore: integer range 0 to 255;
 	begin
 		if Reset = '1' then

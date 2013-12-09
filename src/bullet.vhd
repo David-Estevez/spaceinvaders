@@ -1,6 +1,7 @@
 ----------------------------------------------------------------------------------
 -- Invaders
 -- Sergio Vilches
+-- David Estévez Fernández
 ----------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -47,7 +48,7 @@ begin
          q => tick
    );
 
-   process (reset, clk)
+   process (reset, clk,intbullX,intbullY)
 		variable intflying: std_logic;
    begin
       if reset = '1' then 

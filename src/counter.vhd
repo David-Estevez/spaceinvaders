@@ -1,6 +1,7 @@
 ----------------------------------------------------------------------------------
 -- N-BIT COUNTER WITH GENERIC MAXIMUM, ENABLE, COUT AND SYNCHROUNOUS CLEAR
 -- Sergio Vilches
+-- David Estévez Fernández
 -- Counts from 0 to max (included) and then resets to 0
 ----------------------------------------------------------------------------------
 library IEEE;

@@ -87,7 +87,7 @@ begin
    enableTim2 <= not enableTim1;
       
 	-- Main process
-   process (reset, clk)
+   process (reset, clk, sighit1, sighit2)
 		variable intBulletX1: integer range 0 to 39; -- Temporarily storage for bullet 1 X position translated into 2-bit-per-alien coordinates
 		variable intBulletX2: integer range 0 to 39; -- Temporarily storage for bullet 2 X position translated into 2-bit-per-alien coordinates
 		variable intLevel: integer range 0 to 7; 	 -- Temporarily storage for level
