@@ -61,6 +61,8 @@ architecture Behavioral of SpaceInv is
 		bullY2 	: in std_logic_vector (3 downto 0);
 		bulletFlying2: in std_logic;
 		specialScreen: in std_logic_vector( 2 downto 0);
+        p1Score:  in std_logic_vector(7 downto 0);
+        p2Score:  in std_logic_vector(7 downto 0);
 		rgb 	: out std_logic_vector(2 downto 0)
 );
 	END COMPONENT;
@@ -226,6 +228,8 @@ begin
 					bullY2 			=> p2bullY,
 					bulletFlying2  => p2bulletFlying,
 					specialScreen  => specialScreen,
+                    p1Score       => p1Score, 
+                    p2Score       => p2Score,
 					rgb 	 			=> rgb
 					);
 	

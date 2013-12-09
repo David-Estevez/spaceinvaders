@@ -31,6 +31,8 @@ port (
 	bullY2 	: in std_logic_vector (3 downto 0);
 	bulletFlying2: in std_logic;
 	specialScreen: in std_logic_vector( 2 downto 0);
+    p1Score:  in std_logic_vector(7 downto 0);
+    p2Score:  in std_logic_vector(7 downto 0);
 	rgb 	: out std_logic_vector(2 downto 0)
 );
 end screenFormat;
@@ -231,7 +233,7 @@ begin
 					-- Show player 1 bullet in red
 					if bulletFlying1 = '1' and (x = bullX1) and (y = bullY1) then
 						if funny_bullet( indY, indX) = '1' then
-							rgb <= RED;
+							rgb <= CYAN;
 						else
 							rgb <= BLACK;
 						end if;
@@ -255,7 +257,7 @@ begin
 					-- Show ship 2 in cyan
 					elsif  player2shown  = '1' and (x = shipX2) and (y = std_logic_vector(to_unsigned(14,4))) then
 						if ship_sprite( indY, indX) = '1' then
-							rgb <= CYAN;
+							rgb <= RED;
 						else
 							rgb <= BLACK;
 						end if;
@@ -285,6 +287,46 @@ begin
 				when "001" =>
 					-- You win screen
 					-------------------------------------
+					if (y = std_logic_vector(to_unsigned(5,4))) then
+						-- We are in the correct line
+						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(8,5)))) then
+							-- We are in the correct box
+							if (p1Score(to_integer(unsigned(x))) = '1') then
+								-- Show an alien
+								currentPixel := alien1( indY, indX);
+								if currentPixel = '1' then
+									rgb <= BLUE;
+								else
+									rgb <= BLACK;
+								end if;
+							else
+								rgb <= BLACK;
+							end if;
+						else
+							rgb <= BLACK;
+						end if;						
+
+					elsif (y = std_logic_vector(to_unsigned(7,4))) then
+						-- We are in the correct line
+						if ((x > std_logic_vector(to_unsigned(0,5))) and (x < std_logic_vector(to_unsigned(8,5)))) then
+							-- We are in the correct box
+							if (p2Score(to_integer(unsigned(x))) = '1') then
+								-- Show an alien
+								currentPixel := alien1( indY, indX);
+								if currentPixel = '1' then
+									rgb <= RED;
+								else
+									rgb <= BLACK;
+								end if;
+							else
+								rgb <= BLACK;
+							end if;
+						else
+							rgb <= BLACK;
+						end if;	
+					end if;	
+
+					
 					if (x(0) xor y(0)) = '1' then
 						rgb <= BLACK;
 					else
