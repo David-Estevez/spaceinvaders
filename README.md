@@ -33,6 +33,12 @@ CONTROL DE VERSIONES
 	https://github.com/David-Estevez/spaceinvaders
 
 -------------------------------------
+VIDEO DEL FUNCIONAMIENTO
+-------------------------------------
+
+	https://www.youtube.com/watch?v=hXu0JZxtDas
+
+-------------------------------------
 ACERCA DEL IDIOMA USADO EN EL CÓDIGO
 -------------------------------------
 
@@ -107,3 +113,8 @@ EXPLICACIÓN DE LOS WARNINGS
 		
 		Similar a WARNING:Xst:646: Un bit de un bus no se usa en un proceso.
 
+-------------------------------------
+AGRADECIMIENTOS
+-------------------------------------
+
+	Gracias a Ruy García y Nieves Cubo (Promoción 2013 UC3m) por prestarnos los mandos que hicieron a mano para la demo.
