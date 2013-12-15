@@ -6,3 +6,11 @@
 	\includegraphics[width=0.4\textwidth, angle=-90] {bullet_block.pdf}
 	\caption{Interfaz de la entidad Bala}\label{fig:bullet_block}
 \end{figure}
+
+Cada entidad \emph{player} incluye una entidad \emph{bala} que, disparada desde la nave correspondiente, puede dañar o destruir invasores.
+
+En el instante en el que se detecta una pulsación de disparo (señal \emph{shoot}), la bala copia la posición horizontal de la nave y se sitúa justo encima de ella. A partir de entonces, la bala asciende verticalmente a una velocidad marcada por la señal \emph{tick}, que procede de un temporizador externo.
+
+La bala continúa moviéndose hasta que llega al final de la pantalla o alcanza a un invasor. Este último caso se detecta gracias a la señal \emph{hit}, que procede de la entidad \emph{invaders}. Tras esto, la señal \emph{flying} pasa a nivel bajo, indicando que la bala ha desaparecido y no debe ser mostrada en pantalla.
+
+Debido a que no se puede disparar otra bala hasta que la anterior no ha desaparecido, esta entidad no requiere detector de flancos.

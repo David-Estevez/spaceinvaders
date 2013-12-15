@@ -4,7 +4,7 @@ El sistema final se muestra en la figura \ref{fig:spaceinvblock}. El sistema cue
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{spaceinvaders.png}
+	\includegraphics[width=\textwidth]{spaceinvaders.png}
 	\caption{Diagrama de bloques del sistema completo. Algunas conexiones no se han indicado por claridad. }\label{fig:spaceinvblock}
 \end{figure}
 
@@ -22,7 +22,7 @@ Los bloques básicos incluyen:
 Además de esos bloques, se han implementado como mejora los siguientes:
 \begin{itemize}
 	\item {\bfseries Jugador}: Agrupa varios elementos del jugador, como la nave, el disparo y los detectores de flancos, además de contar la puntuación de ese jugador. Es de gran utilidad para incluir dos jugadores en el juego.
-	\item {\bfseries Generador de sonidos}: {\bfseries ??}
+	\item {\bfseries Sintetizador de sonidos}: Genera sonidos de estilo \textit{arcade} que acompañan diferentes acciones del juego.
 	\item {\bfseries Contador de nivel}: sirve para seleccionar la velocidad de juego y dificultad de los marcianos dependiendo de las pantallas ganadas.
 	\item {\bfseries Otros}: Además de los bloques anteriores, se han modificado algunos de los bloques básicos para extender su funcionalidad.
 \end{itemize}
@@ -31,5 +31,4 @@ El mecanismo del juego es el siguiente. Al accionar el interruptor de test en cu
 
 Si los invasores alcanzan el final de la pantalla, la partida se termina y los jugadores pierden. Si, por el contrario, los jugadores consiguen alcanzar a todos los invasores, superan la pantalla y el nivel se incrementa en 1, pudiendo jugar el siguiente nivel hasta un máximo de 8 niveles, en los que la dificultad de los marcianos y la velocidad de los mismos aumenta. Existen 3 tipos de invasores, verdes, amarillos y blancos, que requieren 1, 2 y 3 disparos respectivamente para morir. Cada disparo acertado aumenta la puntuación de ese jugador en 1 unidad. Si se pierde la partida en cualquiera de los niveles los jugadores deben empezar de nuevo desde el primer nivel (no se dispone de vidas extra).
 
-{\bfseries añadir aquí algo sobre el sonido}
 \newpage

@@ -1,9 +1,11 @@
-\documentclass{article}
+\documentclass[11pt]{article}
 \usepackage[usenames,dvips]{color}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage[top=1.55cm, bottom=2.29cm, left=1.6cm, right=1.47cm]{geometry}
+\usepackage[top=2cm, bottom=2cm, left=2.5cm, right=2cm]{geometry}
+\widowpenalty=1000
+\clubpenalty=1000
 \usepackage{fancyhdr}
 \usepackage{hyperref}
 \hypersetup{
@@ -92,8 +94,26 @@ Anna Vaskova
 \input{statemachine}
 \input{player}
 \input{ship}
+\input{bullet}
 \input{invaders}
+\input{toneGen}
 \newpage
-\section{Conclusión / Posibles mejoras}
+\section{Posibles mejoras}
+
+
+Incluso con la funcionalidad extra que se ha añadido a esta implementación, sigue habiendo muchas diferencias con el videojuego original. Muchas de ellas se deben a la recomendación del uso de celdas de 32x32 píxeles que se detalla en el manual de prácticas. Esto fuerza a que el movimiento de la nave, bala e invasores sea escalonado en vez de contínuo.
+
+
+Otras diferencias con el juego original son más fáciles de aplicar y han sido incluidas por diferentes compañeros de prácticas: varias líneas de invasores, disparos desde los invasores hacia la nave o animaciones de los iconos.
+
+\section{Conclusión}
+
+Se ha conseguido implementar con éxito una versión multijugador de Space Invaders usando lógica programable y programación estructurada en VHDL. 
+
+
+Esta práctica ilustra el propósito de los lenguajes de descripción de hardware: para desarrollar el videojuego se han configurado más de 1000 LUTs (que equivalen a varios miles de puertas lógicas) y se ha conseguido que no haya ningún problema de realimentación (latches) ni funcionalidad no prevista (bugs). Esto sería imposible sin la abstracción que proveen los lenguajes de descripción de harware. 
+
+
+La forma con la que está organizada la práctica empuja a encapsular y probar entidades de diseño, conceptos básicos para poder reusar código y que el diseño crezca a paso seguro.
 %
 \end{document}
